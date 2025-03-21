@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Any, List
 
 class ResponseDataDTO(BaseModel):
     """DTO cho việc trả về dữ liệu."""
     status: int = Field(..., description="Trạng thái trả về")
     message: str = Field(..., description="Thông điệp trả về")
-    data: any = Field(..., description="Dữ liệu trả về")
+    data: Any = Field(..., description="Dữ liệu trả về")
     
 
 
@@ -61,12 +61,13 @@ class MerchandiseCreateDTO(BaseModel):
     """DTO cho việc tạo mới Merchandise."""
     template_id: int = Field(..., description="ID của MerchandiseTemplate liên kết")
     brand_id: int = Field(..., description="ID của Brand liên kết")
+    supplier_id: Optional[int] = Field(None, description="ID của Supplier liên kết")
     code: int = Field(..., description="Mã của Merchandise")
     name: str = Field(..., max_length=255, description="Tên của Merchandise")
     data_sheet_link: Optional[str] = Field(None, max_length=800, description="Đường dẫn tài liệu kỹ thuật")
     unit: str = Field(..., max_length=50, description="Đơn vị của Merchandise")
     description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
-    data_json: str = Field(..., description="Dữ liệu JSON của Merchandise")
+    data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
 
 
 class MerchandiseUpdateDTO(BaseModel):
@@ -97,3 +98,46 @@ class PriceInfoUpdateDTO(BaseModel):
     sale_vat: Optional[float] = Field(None, description="VAT bán hàng")
     import_price_non_vat: Optional[float] = Field(None, description="Giá nhập không VAT")
     sale_price_non_vat: Optional[float] = Field(None, description="Giá bán không VAT")
+    
+
+class UserCreateDTO(BaseModel):
+    """DTO cho việc tạo mới User."""
+    username: str = Field(..., max_length=50, description="Tên đăng nhập")
+    password: str = Field(..., max_length=50, description="Mật khẩu")
+    full_name: str = Field(..., max_length=255, description="Họ tên")
+    email: str = Field(..., max_length=255, description="Email")
+    phone: str = Field(..., max_length=20, description="Số điện thoại")
+    role_id: int = Field(..., max_length=50, description="Vai trò")
+
+class UserUpdateDTO(BaseModel):
+    """DTO cho việc cập nhật User."""
+    username: Optional[str] = Field(None, max_length=50, description="Tên đăng nhập")
+    password: Optional[str] = Field(None, max_length=50, description="Mật khẩu")
+    full_name: Optional[str] = Field(None, max_length=255, description="Họ tên")
+    email: Optional[str] = Field(None, max_length=255, description="Email")
+    phone: Optional[str] = Field(None, max_length=20, description="Số điện thoại")
+    role_id: Optional[int] = Field(None, max_length=50, description="Vai trò")
+    
+class NotificationDTO(BaseModel):
+    """DTO cho việc tạo mới Notification."""
+    title: str = Field(..., max_length=255, description="Tiêu đề thông báo")
+    content: str = Field(..., description="Nội dung thông báo")
+    user_id: int = Field(..., description="ID của User liên kết")
+    is_read: bool = Field(..., description="Trạng thái đã đọc")
+    created_at: str = Field(..., description="Thời gian tạo thông báo")
+
+class SectorCreateDTO(BaseModel):
+    """DTO cho việc tạo mới Sector."""
+    code: str = Field(..., max_length=50, description="Mã của Sector")
+    name: str = Field(..., max_length=255, description="Tên của Sector")
+    description: Optional[str] = Field(None, description="Mô tả Sector")
+    image: Optional[str] = Field(None, max_length=300, description="Đường dẫn hình ảnh của Sector")
+    
+class ComboCreateDTO(BaseModel):
+    """DTO cho việc tạo mới Combo."""
+    code: str = Field(..., max_length=50, description="Mã của Combo")
+    name: str = Field(..., max_length=255, description="Tên của Combo")
+    description: Optional[str] = Field(None, description="Mô tả Combo")
+    image: Optional[str] = Field(None, max_length=300, description="Đường dẫn hình ảnh của Combo")
+    total_price: float = Field(..., description="Giá của Combo")
+    list_combo_merchandise: List[dict] = Field(..., description="Danh sách Merchandise liên kết")

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, PotentialCustomer, Supplier
+from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, PotentialCustomer, Supplier,ComboMerchandise, Combo
 
 
 
@@ -349,5 +349,181 @@ class PriceInfoRepository:
         if not price_info:
             return False
         db.delete(price_info)
+        db.commit()
+        return True
+    
+class ComboRepository:
+    """Repository cho model Combo."""
+
+    @staticmethod
+    def create_combo(db: Session, combo_data: dict) -> Combo:
+        """Tạo một Combo mới."""
+        combo = Combo(**combo_data)
+        db.add(combo)
+        db.commit()
+        db.refresh(combo)
+        return combo
+
+    @staticmethod
+    def get_combo_by_id(db: Session, combo_id: int) -> Combo:
+        """Lấy Combo theo ID."""
+        return db.query(Combo).filter(Combo.id == combo_id).first()
+
+    @staticmethod
+    def get_all_combos(db: Session):
+        """Lấy danh sách tất cả Combo."""
+        return db.query(Combo).all()
+
+    @staticmethod
+    def update_combo(db: Session, combo_id: int, update_data: dict) -> Combo:
+        """Cập nhật Combo theo ID."""
+        combo = db.query(Combo).filter(Combo.id == combo_id).first()
+        if not combo:
+            return None
+        for key, value in update_data.items():
+            setattr(combo, key, value)
+        db.commit()
+        db.refresh(combo)
+        return combo
+
+    @staticmethod
+    def delete_combo(db: Session, combo_id: int) -> bool:
+        """Xóa Combo theo ID."""
+        combo = db.query(Combo).filter(Combo.id == combo_id).first()
+        if not combo:
+            return False
+        db.delete(combo)
+        db.commit()
+        return True
+
+class ComboMerchandiseRepository:
+    """Repository cho model ComboMerchandise."""
+
+    @staticmethod
+    def create_combo_merchandise(db: Session, combo_merchandise_data: dict) -> ComboMerchandise:
+        """Tạo một ComboMerchandise mới."""
+        combo_merchandise = ComboMerchandise(**combo_merchandise_data)
+        db.add(combo_merchandise)
+        db.commit()
+        db.refresh(combo_merchandise)
+        return combo_merchandise
+
+    @staticmethod
+    def get_combo_merchandise_by_id(db: Session, combo_merchandise_id: int) -> ComboMerchandise:
+        """Lấy ComboMerchandise theo ID."""
+        return db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
+
+    @staticmethod
+    def get_all_combo_merchandises(db: Session):
+        """Lấy danh sách tất cả ComboMerchandise."""
+        return db.query(ComboMerchandise).all()
+
+    @staticmethod
+    def update_combo_merchandise(db: Session, combo_merchandise_id: int, update_data: dict) -> ComboMerchandise:
+        """Cập nhật ComboMerchandise theo ID."""
+        combo_merchandise = db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
+        if not combo_merchandise:
+            return None
+        for key, value in update_data.items():
+            setattr(combo_merchandise, key, value)
+        db.commit()
+        db.refresh(combo_merchandise)
+        return combo_merchandise
+
+    @staticmethod
+    def delete_combo_merchandise(db: Session, combo_merchandise_id: int) -> bool:
+        """Xóa ComboMerchandise theo ID."""
+        combo_merchandise = db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
+        if not combo_merchandise:
+            return False
+        db.delete(combo_merchandise)
+        db.commit()
+        return True
+    
+class RoleRepository:
+    """Repository cho model Role."""
+
+    @staticmethod
+    def create_role(db: Session, role_data: dict) -> Role:
+        """Tạo một Role mới."""
+        role = Role(**role_data)
+        db.add(role)
+        db.commit()
+        db.refresh(role)
+        return role
+
+    @staticmethod
+    def get_role_by_id(db: Session, role_id: int) -> Role:
+        """Lấy Role theo ID."""
+        return db.query(Role).filter(Role.id == role_id).first()
+
+    @staticmethod
+    def get_all_roles(db: Session):
+        """Lấy danh sách tất cả Role."""
+        return db.query(Role).all()
+
+    @staticmethod
+    def update_role(db: Session, role_id: int, update_data: dict) -> Role:
+        """Cập nhật Role theo ID."""
+        role = db.query(Role).filter(Role.id == role_id).first()
+        if not role:
+            return None
+        for key, value in update_data.items():
+            setattr(role, key, value)
+        db.commit()
+        db.refresh(role)
+        return role
+
+    @staticmethod
+    def delete_role(db: Session, role_id: int) -> bool:
+        """Xóa Role theo ID."""
+        role = db.query(Role).filter(Role.id == role_id).first()
+        if not role:
+            return False
+        db.delete(role)
+        db.commit()
+        return True
+
+class SectorRepository:
+    """Repository cho model Sector."""
+
+    @staticmethod
+    def create_sector(db: Session, sector_data: dict) -> Sector:
+        """Tạo một Sector mới."""
+        sector = Sector(**sector_data)
+        db.add(sector)
+        db.commit()
+        db.refresh(sector)
+        return sector
+
+    @staticmethod
+    def get_sector_by_id(db: Session, sector_id: int) -> Sector:
+        """Lấy Sector theo ID."""
+        return db.query(Sector).filter(Sector.id == sector_id).first()
+
+    @staticmethod
+    def get_all_sectors(db: Session):
+        """Lấy danh sách tất cả Sector."""
+        return db.query(Sector).all()
+
+    @staticmethod
+    def update_sector(db: Session, sector_id: int, update_data: dict) -> Sector:
+        """Cập nhật Sector theo ID."""
+        sector = db.query(Sector).filter(Sector.id == sector_id).first()
+        if not sector:
+            return None
+        for key, value in update_data.items():
+            setattr(sector, key, value)
+        db.commit()
+        db.refresh(sector)
+        return sector
+
+    @staticmethod
+    def delete_sector(db: Session, sector_id: int) -> bool:
+        """Xóa Sector theo ID."""
+        sector = db.query(Sector).filter(Sector.id == sector_id).first()
+        if not sector:
+            return False
+        db.delete(sector)
         db.commit()
         return True

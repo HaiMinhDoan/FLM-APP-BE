@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Float, DateTime, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Float, DateTime, Boolean,Table, MetaData
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 import json
 from datetime import datetime
@@ -6,7 +6,7 @@ from datetime import datetime
 # Cấu hình database
 POSTGRES_USER = "postgres"
 POSTGRES_PASSWORD = "0146424Minh"
-POSTGRES_DB = "flm_app"
+POSTGRES_DB = "slm_app"
 POSTGRES_HOST = "localhost"  # Hoặc địa chỉ server PostgreSQL
 POSTGRES_PORT = "5432"  # Cổng mặc định của PostgreSQL
 
@@ -29,7 +29,13 @@ def get_db():
     finally:
         db.close()
         
-
+# Định nghĩa bảng trung gian user_roles
+user_roles = Table(
+    'user_roles',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('role_id', Integer, ForeignKey('roles.id'), primary_key=True)
+)
 class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -46,6 +52,7 @@ class Role(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
     description = Column(Text)
+    list_users = relationship("User", secondary="user_roles", back_populates="list_roles")
 
 class Token(Base):
     __tablename__ = 'tokens'
@@ -90,11 +97,16 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=True)
     phone = Column(String(16), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
+    parent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    created_at = Column(DateTime, default=datetime.now)
     
     list_roles = relationship("Role", secondary="user_roles", back_populates="list_users")
     list_potential_customers = relationship("PotentialCustomer", back_populates="user")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới Notification
+    list_downline = relationship("User", back_populates="parent", cascade="all, delete-orphan")
+    parent = relationship("User", back_populates="list_downline", remote_side=[id])
+    tokens = relationship("Token", back_populates="user", cascade="all, delete-orphan")
     
 class PotentialCustomer(Base):
     __tablename__ = 'potential_customers'
@@ -106,6 +118,8 @@ class PotentialCustomer(Base):
     email = Column(String(255), nullable=False)
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
+    
+    user = relationship("User", back_populates="list_potential_customers")
 
 class Sector(Base):
     __tablename__ = 'sectors'
@@ -157,7 +171,7 @@ class Merchandise(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     template_id = Column(Integer, ForeignKey('merchandise_templates.id'), nullable=False)
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
-    supplier_id = Column(Integer, ForeignKey('suppliers.id'), nullable=False)
+    supplier_id = Column(Integer, ForeignKey('suppliers.id'), nullable=True)
     code = Column(Integer, unique=True, nullable=False) # Ma code vat tu
     name = Column(String(255), nullable=False)  # Tên vật tư cụ thể
     data_sheet_link = Column(String(800), nullable=True)
@@ -180,13 +194,32 @@ class PriceInfo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     merchandise_id = Column(Integer, ForeignKey('merchandises.id'), nullable=False)  # Foreign key to Merchandise
     import_vat = Column(Float, nullable=False)
-    sale_vat = Column(float,nullable=False)
-    import_price_non_vat = Column(float,nullable=False)
-    sale_price_non_vat = Column(float,nullable=False)
+    sale_vat = Column(Float,nullable=False)
+    import_price_non_vat = Column(Float,nullable=False)
+    sale_price_non_vat = Column(Float,nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     
     merchandise = relationship("Merchandise", back_populates="price_infos")  # Liên kết tới Merchandise
+
+class Combo(Base):
+    __tablename__ = 'combos'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(50), nullable=False, unique=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    image = Column(String(300))
+    created_at = Column(DateTime, default=datetime.now)
+    total_price = Column(Float, nullable=False)
     
+    combo_merchandises = relationship("ComboMerchandise", back_populates="combo", cascade="all, delete-orphan")
+
+class ComboMerchandise(Base):
+    __tablename__ = 'combo_merchandises'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    combo_id = Column(Integer, ForeignKey('combos.id'), nullable=False)
+    merchandise_id = Column(Integer, ForeignKey('merchandises.id'), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu

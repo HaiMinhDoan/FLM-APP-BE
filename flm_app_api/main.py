@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from flm_app_api.model.model import get_db
-from flm_app_api.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository
-from flm_app_api.model.dto import UserCreateDTO, UserUpdateDTO, NotificationDTO
+from flm_app_api.repository.model_repo import ComboRepository, MerchandiseTemplateRepository, SectorRepository, UserRepository, LoginHistoryRepository, NotificationRepository, ComboMerchandiseRepository, MerchandiseRepository
+from flm_app_api.model.dto import ComboCreateDTO, UserCreateDTO, UserUpdateDTO, NotificationDTO, MerchandiseCreateDTO, SectorCreateDTO, MerchandiseTemplateCreateDTO
 from typing import List
+from flm_app_api.model.model import User, LoginHistory, Notification, Role, Base, Combo, Sector
+import json
 
 app = FastAPI()
 
@@ -17,7 +19,17 @@ def get_users(db: Session = Depends(get_db)):
 @app.post("/api/users", response_model=dict)
 def create_user(user_data: UserCreateDTO, db: Session = Depends(get_db)):
     """Tạo người dùng mới."""
-    return UserRepository.create_user(db, user_data.dict())
+    newUser =  UserRepository.create_user(db, user_data=user_data.dict())
+    if not newUser:
+        raise HTTPException(status_code=404, detail="Create user failed")
+    role_id = user_data.role_id
+    role = db.query(Role).filter(Role.id == role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    list_roles = List[dict]
+    list_roles.append(role)
+    UserRepository.update_user(db, newUser.id, {"list_roles": list_roles})
+    return {"message": "User created successfully"}
 
 @app.get("/api/users/{id}", response_model=dict)
 def get_user(id: int, db: Session = Depends(get_db)):
@@ -42,7 +54,7 @@ def delete_user(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
 
-@app.put("/api/users/{id}/status")
+@app.put("/api/users/{id}/{status}")
 def update_user_status(id: int, status: str, db: Session = Depends(get_db)):
     """Cập nhật trạng thái người dùng."""
     updated_user = UserRepository.update_user(db, id, {"status": status})
@@ -51,9 +63,9 @@ def update_user_status(id: int, status: str, db: Session = Depends(get_db)):
     return updated_user
 
 @app.put("/api/users/{id}/password")
-def update_user_password(id: int, new_password: str, db: Session = Depends(get_db)):
+def update_user_password(id: int, new_password: dict, db: Session = Depends(get_db)):
     """Đổi mật khẩu người dùng."""
-    updated_user = UserRepository.update_user(db, id, {"password": new_password})
+    updated_user = UserRepository.update_user(db, id, new_password)
     if not updated_user:
         raise HTTPException(status_code=404, detail="User not found")
     return updated_user
@@ -198,6 +210,117 @@ def update_territories(id: int, territories_data: dict, db: Session = Depends(ge
     # Giả sử có logic cập nhật khu vực
     return {"message": f"Territories updated for agent {id}"}
 
+
+
+
+
+
+
+@app.get("/api/sector", response_model=List[dict])
+def get_sectors(db: Session = Depends(get_db)):
+    """Lấy danh sách Sector."""
+    return SectorRepository.get_all_sectors(db)
+
+@app.post("/api/sector", response_model=dict)
+def create_sector(sector_data: SectorCreateDTO, db: Session = Depends(get_db)):
+    """Tạo Sector mới."""
+    newSector = SectorRepository.create_sector(db, sector_data=sector_data.dict())
+    if not newSector:
+        raise HTTPException(status_code=404, detail="Create sector failed")
+    return {"message": "Sector created successfully"}
+
+@app.get("/api/sector/{id}", response_model=dict)
+def get_sector(id: int, db: Session = Depends(get_db)):
+    """Lấy thông tin Sector."""
+    sector = SectorRepository.get_sector_by_id(db, id)
+    if not sector:
+        raise HTTPException(status_code=404, detail="Sector not found")
+    return sector
+
+@app.put("/api/sector/{id}", response_model=dict)
+def update_sector(id: int, sector_data: SectorCreateDTO, db: Session = Depends(get_db)):
+    """Cập nhật thông tin Sector."""
+    updated_sector = SectorRepository.update_sector(db, id, sector_data.dict(exclude_unset=True))
+    if not updated_sector:
+        raise HTTPException(status_code=404, detail="Sector not found")
+    return updated_sector
+
+@app.get("/api/merchandise-template", response_model=List[dict])
+def get_merchandises_template(db: Session = Depends(get_db)):
+    """Lấy danh sách loại vật tư."""
+    return MerchandiseTemplateRepository.get_all_merchandise_templates(db)
+
+@app.post("/api/merchandise-template", response_model=dict)
+def create_merchandise_template(merchandise_template_data: MerchandiseTemplateCreateDTO, db: Session = Depends(get_db)):
+    data = merchandise_template_data.dict()
+    data["structure_json"] = json.dumps(data["structure_json"])
+    """Tạo loại vật tư mới."""
+    newMerchandise =  MerchandiseTemplateRepository.create_merchandise_template(db, merchandise_template_data=data)
+    if not newMerchandise:
+        raise HTTPException(status_code=404, detail="Create merchandise failed")
+    return {"message": "Merchandise created successfully"}
+
+@app.get("/api/merchandise-template/{id}", response_model=dict)
+def get_merchandise_template(id: int, db: Session = Depends(get_db)):
+    """Lấy thông tin sản phẩm."""    
+    merchandise = MerchandiseTemplateRepository.get_merchandise_template_by_id(db, id)
+    if not merchandise:
+        raise HTTPException(status_code=404, detail="Merchandise not found")
+    merchandise["structure_json"] = json.loads(merchandise["structure_json"])
+    return merchandise
+
+@app.post("/api/products/add")
+def create_merchandise(merchandise_dto: MerchandiseCreateDTO,db: Session = Depends(get_db)):
+    """Tạo sản phẩm mới."""
+    data_json = ""
+    if merchandise_dto.data_json:
+        data_json = json.dumps(merchandise_dto.data_json)
+    merchandise_data = {
+        "template_id": merchandise_dto.template_id,
+        "brand_id": merchandise_dto.brand_id,
+        "supplier_id": merchandise_dto.supplier_id,
+        "code": merchandise_dto.code,
+        "name": merchandise_dto.name,
+        "data_sheet_link": merchandise_dto.data_sheet_link,
+        "unit": merchandise_dto.unit,
+        "description_in_contract": merchandise_dto.description_in_contract,
+        "data_json": data_json
+    }
+    newMerchandise =  MerchandiseRepository.create_merchandise(db, merchandise_data)
+    if not newMerchandise:
+        raise HTTPException(status_code=404, detail="Create merchandise failed")
+    return {"message": "Merchandise created successfully"}
+
+@app.get("/api/products", response_model=List[dict])
+def get_merchandises(db: Session = Depends(get_db)):
+    """Lấy danh sách sản phẩm."""
+    list_merchandises = MerchandiseRepository.get_all_merchandises(db)
+    for merchandise in list_merchandises:
+        merchandise["data_json"] = json.loads(merchandise["data_json"])
+    return MerchandiseRepository.get_all_merchandises(db)
+
+@app.get("/api/products/{id}", response_model=dict)
+def get_merchandise(id: int, db: Session = Depends(get_db)):
+    """Lấy thông tin sản phẩm."""
+    merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+    if not merchandise:
+        raise HTTPException(status_code=404, detail="Merchandise not found")
+    merchandise["data_json"] = json.loads(merchandise["data_json"])
+    return merchandise
+
+@app.post("/api/combo", response_model=dict)
+def create_combo(combo_data: ComboCreateDTO, db: Session = Depends(get_db)):
+    """Tạo combo mới."""
+    total_price = 0
+    newCombo = ComboRepository.create_combo(db, combo_data=combo_data.dict())
+    if not newCombo:
+        raise HTTPException(status_code=404, detail="Create combo failed")
+    for combo_merchandise in combo_data.list_combo_merchandise:
+        total_price += combo_merchandise["price"]
+        ComboMerchandiseRepository.create_combo_merchandise(db, {"combo_id": newCombo.id, "merchandise_id": combo_merchandise["merchandise_id"], "quantity": combo_merchandise["quantity"], "price": combo_merchandise["price"]})
+    ComboRepository.update_combo(db, newCombo.id, {"total_price": total_price})
+    return {"message": "Combo created successfully"}
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8080, reload=True)
