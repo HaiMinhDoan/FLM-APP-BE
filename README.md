@@ -8,3 +8,6 @@ my_env\Scripts\Activate
 pip install -r requirement.txt    
 
 uvicorn flm_app_api.main:app --host localhost --port 8080 --reload  
+
+create db with name slm_app in postgresql
+
