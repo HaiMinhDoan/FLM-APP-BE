@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, PotentialCustomer, Supplier,ComboMerchandise, Combo
 
 
@@ -279,11 +279,21 @@ class MerchandiseRepository:
     def get_merchandise_by_id(db: Session, merchandise_id: int) -> Merchandise:
         """Lấy Merchandise theo ID."""
         return db.query(Merchandise).filter(Merchandise.id == merchandise_id).first()
-
+    
+    @staticmethod
+    def get_merchandise_by_id_with_prices(db: Session, id: int) -> Merchandise:
+        """Lấy Merchandise theo ID cùng với PriceInfo."""
+        return db.query(Merchandise).options(joinedload(Merchandise.price_infos)).filter(Merchandise.id == id).first()
+    
     @staticmethod
     def get_all_merchandises(db: Session):
         """Lấy danh sách tất cả Merchandise."""
         return db.query(Merchandise).all()
+    
+    @staticmethod
+    def get_all_merchandises_with_prices(db: Session):
+        """Lấy danh sách tất cả Merchandise cùng với PriceInfo."""
+        return db.query(Merchandise).options(joinedload(Merchandise.price_infos)).all()
 
     @staticmethod
     def update_merchandise(db: Session, merchandise_id: int, update_data: dict) -> Merchandise:

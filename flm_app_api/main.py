@@ -297,12 +297,12 @@ def get_merchandises(db: Session = Depends(get_db)):
     list_merchandises = MerchandiseRepository.get_all_merchandises(db)
     for merchandise in list_merchandises:
         merchandise["data_json"] = json.loads(merchandise["data_json"])
-    return MerchandiseRepository.get_all_merchandises(db)
+    return MerchandiseRepository.get_all_merchandises_with_prices(db)
 
 @app.get("/api/products/{id}", response_model=dict)
 def get_merchandise(id: int, db: Session = Depends(get_db)):
     """Lấy thông tin sản phẩm."""
-    merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+    merchandise = MerchandiseRepository.get_merchandise_by_id_with_prices(db, id)
     if not merchandise:
         raise HTTPException(status_code=404, detail="Merchandise not found")
     merchandise["data_json"] = json.loads(merchandise["data_json"])
