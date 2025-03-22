@@ -46,7 +46,7 @@ class MerchandiseTemplateCreateDTO(BaseModel):
     code: str = Field(..., max_length=50, description="Mã của MerchandiseTemplate")
     name: str = Field(..., max_length=255, description="Tên của MerchandiseTemplate")
     sector_id: int = Field(..., description="ID của Sector liên kết")
-    structure_json: str = Field(..., description="Cấu trúc JSON của MerchandiseTemplate")
+    structure_json: dict = Field(..., description="Cấu trúc JSON của MerchandiseTemplate")
 
 
 class MerchandiseTemplateUpdateDTO(BaseModel):
@@ -133,11 +133,22 @@ class SectorCreateDTO(BaseModel):
     description: Optional[str] = Field(None, description="Mô tả Sector")
     image: Optional[str] = Field(None, max_length=300, description="Đường dẫn hình ảnh của Sector")
     
-class ComboCreateDTO(BaseModel):
-    """DTO cho việc tạo mới Combo."""
-    code: str = Field(..., max_length=50, description="Mã của Combo")
-    name: str = Field(..., max_length=255, description="Tên của Combo")
-    description: Optional[str] = Field(None, description="Mô tả Combo")
-    image: Optional[str] = Field(None, max_length=300, description="Đường dẫn hình ảnh của Combo")
-    total_price: float = Field(..., description="Giá của Combo")
-    list_combo_merchandise: List[dict] = Field(..., description="Danh sách Merchandise liên kết")
+
+class PreQuoteMerchandiseCreateDTO(BaseModel):
+    """DTO cho việc tạo mới PreQuoteMerchandise."""
+    pre_quote_id: int = Field(..., description="ID của PreQuote liên kết")
+    merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
+    quantity: int = Field(..., description="Số lượng")
+    price: float = Field(..., description="Giá trên đơn vị")
+
+class PreQuoteCreateDTO(BaseModel):
+    """DTO cho việc tạo mới PreQuote."""
+    merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
+    quantity: int = Field(..., description="Số lượng")
+    note: Optional[str] = Field(None, description="Ghi chú")
+    customer_id: int = Field(..., description="ID của khách hàng")
+    status: int = Field(..., description="Trạng thái")
+    total_price: float = Field(..., description="Tổng giá")
+    kind : str = Field(..., description="Loại")
+    
+    list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")

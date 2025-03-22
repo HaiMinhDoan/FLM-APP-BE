@@ -46,6 +46,9 @@ class Customer(Base):
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
+    user = relationship("User", back_populates="customers")
+    
 
 class Role(Base):
     __tablename__ = 'roles'
@@ -101,25 +104,15 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now)
     
     list_roles = relationship("Role", secondary="user_roles", back_populates="list_users")
-    list_potential_customers = relationship("PotentialCustomer", back_populates="user")
+    list_customers = relationship("Customer", back_populates="user")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới Notification
     list_downline = relationship("User", back_populates="parent", cascade="all, delete-orphan")
     parent = relationship("User", back_populates="list_downline", remote_side=[id])
     tokens = relationship("Token", back_populates="user", cascade="all, delete-orphan")
     
-class PotentialCustomer(Base):
-    __tablename__ = 'potential_customers'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    name = Column(String(255), nullable=False)
-    address = Column(String(255), nullable=False)
-    phone = Column(String(16), nullable=False)
-    email = Column(String(255), nullable=False)
-    description = Column(Text)
-    created_at = Column(DateTime, default=datetime.now)
+    customers = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
     
-    user = relationship("User", back_populates="list_potential_customers")
 
 class Sector(Base):
     __tablename__ = 'sectors'
@@ -160,7 +153,7 @@ class MerchandiseTemplate(Base):
     structure_json = Column(Text, nullable=False)  # Mẫu cấu trúc dạng JSON
     sector = relationship('Sector')
 
-    def get_structure(self):
+    def get_data_structure(self):
         """ Chuyển đổi JSON string thành dict """
         return json.loads(self.structure_json)
 
@@ -172,7 +165,7 @@ class Merchandise(Base):
     template_id = Column(Integer, ForeignKey('merchandise_templates.id'), nullable=False)
     brand_id = Column(Integer, ForeignKey('brands.id'), nullable=False)
     supplier_id = Column(Integer, ForeignKey('suppliers.id'), nullable=True)
-    code = Column(Integer, unique=True, nullable=False) # Ma code vat tu
+    code = Column(String(255), unique=True, nullable=False) # Ma code vat tu
     name = Column(String(255), nullable=False)  # Tên vật tư cụ thể
     data_sheet_link = Column(String(800), nullable=True)
     unit = Column(String(50), nullable=False)
@@ -184,10 +177,18 @@ class Merchandise(Base):
     brand = relationship("Brand") # Liên kết bảng brand
     supplier = relationship("Supplier") # Liên kết bảng supplier
     price_infos = relationship("PriceInfo", back_populates="merchandise", cascade="all, delete-orphan")  # Liên kết tới PriceInfo
-
+    images = relationship("Image", cascade="all, delete-orphan")
+    
     def get_data(self):
         """ Chuyển đổi JSON string thành dict """
         return json.loads(self.data_json)
+
+#Bảng ảnh cho vật tư
+class Image(Base):
+    __tablename__ = 'images'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    merchandise_id = Column(Integer, ForeignKey("merchandises.id"), nullable=False)
+    link = Column(String(800))
 
 class PriceInfo(Base):
     __tablename__ = 'price_info'
@@ -201,25 +202,30 @@ class PriceInfo(Base):
     
     merchandise = relationship("Merchandise", back_populates="price_infos")  # Liên kết tới Merchandise
 
-class Combo(Base):
-    __tablename__ = 'combos'
+class PreQuote(Base):
+    __tablename__ = 'pre_quotes'
     id = Column(Integer, primary_key=True, autoincrement=True)
     code = Column(String(50), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
-    image = Column(String(300))
     created_at = Column(DateTime, default=datetime.now)
     total_price = Column(Float, nullable=False)
+    kind = Column(String(255), nullable=False)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+    customer = relationship("Customer")
+    status = Column(String(255), nullable=False, default='pending')
     
-    combo_merchandises = relationship("ComboMerchandise", back_populates="combo", cascade="all, delete-orphan")
+    pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan")
 
-class ComboMerchandise(Base):
-    __tablename__ = 'combo_merchandises'
+class PreQuoteMerchandise(Base):
+    __tablename__ = 'pre_quote_merchandises'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    combo_id = Column(Integer, ForeignKey('combos.id'), nullable=False)
+    pre_quote_id = Column(Integer, ForeignKey('pre_quotes.id'), nullable=False)
     merchandise_id = Column(Integer, ForeignKey('merchandises.id'), nullable=False)
+    note = Column(String(500))
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
+    merchandise = relationship("Merchandise")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu

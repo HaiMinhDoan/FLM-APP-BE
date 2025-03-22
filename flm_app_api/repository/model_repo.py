@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
-from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, PotentialCustomer, Supplier,ComboMerchandise, Combo
-
+from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote
+from typing import List
 
 
 
@@ -237,9 +237,10 @@ class MerchandiseTemplateRepository:
         return db.query(MerchandiseTemplate).filter(MerchandiseTemplate.id == template_id).first()
 
     @staticmethod
-    def get_all_merchandise_templates(db: Session):
+    def get_all_merchandise_templates(db: Session) -> List[MerchandiseTemplate]:
         """Lấy danh sách tất cả MerchandiseTemplate."""
-        return db.query(MerchandiseTemplate).all()
+        templates = db.query(MerchandiseTemplate).all()
+        return templates
 
     @staticmethod
     def update_merchandise_template(db: Session, template_id: int, update_data: dict) -> MerchandiseTemplate:
@@ -281,9 +282,9 @@ class MerchandiseRepository:
         return db.query(Merchandise).filter(Merchandise.id == merchandise_id).first()
     
     @staticmethod
-    def get_merchandise_by_id_with_prices(db: Session, id: int) -> Merchandise:
+    def get_merchandise_by_id_with_all(db: Session, id: int) -> Merchandise:
         """Lấy Merchandise theo ID cùng với PriceInfo."""
-        return db.query(Merchandise).options(joinedload(Merchandise.price_infos)).filter(Merchandise.id == id).first()
+        return db.query(Merchandise).options(joinedload(Merchandise.price_infos), joinedload(Merchandise.images)).filter(Merchandise.id == id).first()
     
     @staticmethod
     def get_all_merchandises(db: Session):
@@ -362,93 +363,87 @@ class PriceInfoRepository:
         db.commit()
         return True
     
-class ComboRepository:
-    """Repository cho model Combo."""
+class PreQuoteRepository:
+    """Repository cho model PreQuote."""
 
     @staticmethod
-    def create_combo(db: Session, combo_data: dict) -> Combo:
-        """Tạo một Combo mới."""
-        combo = Combo(**combo_data)
-        db.add(combo)
+    def create_pre_quote(db: Session, pre_quote_data: dict) -> PreQuote:
+        """Tạo một PreQuote mới."""
+        pre_quote = PreQuote(**pre_quote_data)
+        db.add(pre_quote)
         db.commit()
-        db.refresh(combo)
-        return combo
+        db.refresh(pre_quote)
+        return pre_quote
 
     @staticmethod
-    def get_combo_by_id(db: Session, combo_id: int) -> Combo:
-        """Lấy Combo theo ID."""
-        return db.query(Combo).filter(Combo.id == combo_id).first()
+    def get_pre_quote_by_id(db: Session, pre_quote_id: int) -> PreQuote:
+        """Lấy PreQuote theo ID."""
+        return db.query(PreQuote).filter(PreQuote.id == pre_quote_id).first()
 
     @staticmethod
-    def get_all_combos(db: Session):
-        """Lấy danh sách tất cả Combo."""
-        return db.query(Combo).all()
+    def get_all_pre_quotes(db: Session):
+        """Lấy danh sách tất cả PreQuote."""
+        return db.query(PreQuote).all()
 
     @staticmethod
-    def update_combo(db: Session, combo_id: int, update_data: dict) -> Combo:
-        """Cập nhật Combo theo ID."""
-        combo = db.query(Combo).filter(Combo.id == combo_id).first()
-        if not combo:
+    def update_pre_quote(db: Session, pre_quote_id: int, update_data: dict) -> PreQuote:
+        """Cập nhật PreQuote theo ID."""
+        pre_quote = db.query(PreQuote).filter(PreQuote.id == pre_quote_id).first()
+        if not pre_quote:
             return None
         for key, value in update_data.items():
-            setattr(combo, key, value)
+            setattr(pre_quote, key, value)
         db.commit()
-        db.refresh(combo)
-        return combo
+        db.refresh(pre_quote)
+        return pre_quote
 
     @staticmethod
-    def delete_combo(db: Session, combo_id: int) -> bool:
-        """Xóa Combo theo ID."""
-        combo = db.query(Combo).filter(Combo.id == combo_id).first()
-        if not combo:
+    def delete_pre_quote(db: Session, pre_quote_id: int) -> bool:
+        """Xóa PreQuote theo ID."""
+        pre_quote = db.query(PreQuote).filter(PreQuote.id == pre_quote_id).first()
+        if not pre_quote:
             return False
-        db.delete(combo)
+        db.delete(pre_quote)
         db.commit()
         return True
-
-class ComboMerchandiseRepository:
-    """Repository cho model ComboMerchandise."""
+class PreQuoteMerchandiseRepository:
+    """Repository cho model PreQuoteMerchandise."""
 
     @staticmethod
-    def create_combo_merchandise(db: Session, combo_merchandise_data: dict) -> ComboMerchandise:
-        """Tạo một ComboMerchandise mới."""
-        combo_merchandise = ComboMerchandise(**combo_merchandise_data)
-        db.add(combo_merchandise)
+    def create_pre_quote_merchandise(db: Session, pre_quote_merchandise_data: dict) -> PreQuoteMerchandise:
+        """Tạo một PreQuoteMerchandise mới."""
+        pre_quote_merchandise = PreQuoteMerchandise(**pre_quote_merchandise_data)
+        db.add(pre_quote_merchandise)
         db.commit()
-        db.refresh(combo_merchandise)
-        return combo_merchandise
+        db.refresh(pre_quote_merchandise)
+        return pre_quote_merchandise
 
     @staticmethod
-    def get_combo_merchandise_by_id(db: Session, combo_merchandise_id: int) -> ComboMerchandise:
-        """Lấy ComboMerchandise theo ID."""
-        return db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
+    def get_pre_quote_merchandise_by_id(db: Session, pre_quote_merchandise_id: int) -> PreQuoteMerchandise:
+        """Lấy PreQuoteMerchandise theo ID."""
+        return db.query(PreQuoteMerchandise).filter(PreQuoteMerchandise.id == pre_quote_merchandise_id).first()
 
     @staticmethod
-    def get_all_combo_merchandises(db: Session):
-        """Lấy danh sách tất cả ComboMerchandise."""
-        return db.query(ComboMerchandise).all()
+    def get_pre_quote_merchandises_by_pre_quote_id(db: Session, pre_quote_id: int):
+        """Lấy danh sách PreQuoteMerchandise theo PreQuote ID."""
+        return db.query(PreQuoteMerchandise).filter(PreQuoteMerchandise.pre_quote_id == pre_quote_id).all()
 
     @staticmethod
-    def update_combo_merchandise(db: Session, combo_merchandise_id: int, update_data: dict) -> ComboMerchandise:
-        """Cập nhật ComboMerchandise theo ID."""
-        combo_merchandise = db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
-        if not combo_merchandise:
+    def update_pre_quote_merchandise(db: Session, pre_quote_merchandise_id: int, update_data: dict) -> PreQuoteMerchandise:
+        """Cập nhật PreQuoteMerchandise theo ID."""
+        pre_quote_merchandise = db.query(PreQuoteMerchandise).filter(PreQuoteMerchandise.id == pre_quote_merchandise_id).first()
+        if not pre_quote_merchandise:
             return None
         for key, value in update_data.items():
-            setattr(combo_merchandise, key, value)
+            setattr(pre_quote_merchandise, key, value)
         db.commit()
-        db.refresh(combo_merchandise)
-        return combo_merchandise
+        db.refresh(pre_quote_merchandise)
+        return pre_quote_merchandise
 
     @staticmethod
-    def delete_combo_merchandise(db: Session, combo_merchandise_id: int) -> bool:
-        """Xóa ComboMerchandise theo ID."""
-        combo_merchandise = db.query(ComboMerchandise).filter(ComboMerchandise.id == combo_merchandise_id).first()
-        if not combo_merchandise:
-            return False
-        db.delete(combo_merchandise)
-        db.commit()
-        return True
+    def delete_pre_quote_merchandise(db: Session, pre_quote_merchandise_id: int) -> bool:
+        """Xóa PreQuoteMerchandise theo ID."""
+        pre_quote_merchandise = db.query(PreQuoteMerchandise).filter(PreQuoteMerchandise.id == pre_quote_merchandise_id).first
     
 class RoleRepository:
     """Repository cho model Role."""
