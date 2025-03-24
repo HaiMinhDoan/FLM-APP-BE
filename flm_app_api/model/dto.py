@@ -136,18 +136,19 @@ class SectorCreateDTO(BaseModel):
 
 class PreQuoteMerchandiseCreateDTO(BaseModel):
     """DTO cho việc tạo mới PreQuoteMerchandise."""
-    pre_quote_id: int = Field(..., description="ID của PreQuote liên kết")
     merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
     quantity: int = Field(..., description="Số lượng")
     price: float = Field(..., description="Giá trên đơn vị")
+    gm_price: float = Field(..., description="Giá mua")
 
 class PreQuoteCreateDTO(BaseModel):
     """DTO cho việc tạo mới PreQuote."""
-    merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
-    quantity: int = Field(..., description="Số lượng")
-    note: Optional[str] = Field(None, description="Ghi chú")
+    description: Optional[str] = Field(None, description="Ghi chú")
+    code: str = Field(..., description="Mã")
+    name: str = Field(..., description="Tên")
     customer_id: int = Field(..., description="ID của khách hàng")
-    status: int = Field(..., description="Trạng thái")
+    status: str = Field(..., description="Trạng thái")
+    installation_type : str = Field(..., description="Loại lắp đặt")
     total_price: float = Field(..., description="Tổng giá")
     kind : str = Field(..., description="Loại")
     

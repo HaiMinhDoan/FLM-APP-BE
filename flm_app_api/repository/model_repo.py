@@ -383,7 +383,7 @@ class PreQuoteRepository:
     @staticmethod
     def get_all_pre_quotes(db: Session):
         """Lấy danh sách tất cả PreQuote."""
-        return db.query(PreQuote).all()
+        return db.query(PreQuote).options(joinedload(PreQuote.customer)).all()
 
     @staticmethod
     def update_pre_quote(db: Session, pre_quote_id: int, update_data: dict) -> PreQuote:
@@ -406,6 +406,16 @@ class PreQuoteRepository:
         db.delete(pre_quote)
         db.commit()
         return True
+    @staticmethod
+    def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
+        """Lấy danh sách PreQuote theo kind."""
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise)).filter(PreQuote.kind == kind, PreQuote.status == "accepted" ).all()
+    
+    @staticmethod
+    def get_pre_quotes_by_kind_and_installation_type(db: Session, kind: str, installation_type: str) -> List[PreQuote]:
+        """Lấy danh sách PreQuote theo kind và installation_type."""
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise)).filter(PreQuote.kind == kind, PreQuote.status == "accepted", PreQuote.installation_type == installation_type).all()
+    
 class PreQuoteMerchandiseRepository:
     """Repository cho model PreQuoteMerchandise."""
 

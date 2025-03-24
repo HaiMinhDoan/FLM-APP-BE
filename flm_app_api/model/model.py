@@ -45,9 +45,10 @@ class Customer(Base):
     email = Column(String(255), nullable=False)
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     
     user = relationship("User", back_populates="customers")
+    pre_quotes = relationship("PreQuote", back_populates="customer")
     
 
 class Role(Base):
@@ -173,11 +174,13 @@ class Merchandise(Base):
     data_json = Column(Text, nullable=False)  # Dữ liệu vật tư dạng JSON
     created_at = Column(DateTime, default=datetime.now)
     active = Column(Boolean, default=True)
+    
     template = relationship("MerchandiseTemplate")  # Liên kết tới mẫu
     brand = relationship("Brand") # Liên kết bảng brand
     supplier = relationship("Supplier") # Liên kết bảng supplier
     price_infos = relationship("PriceInfo", back_populates="merchandise", cascade="all, delete-orphan")  # Liên kết tới PriceInfo
     images = relationship("Image", cascade="all, delete-orphan")
+    pre_quote_merchandises = relationship("PreQuoteMerchandise", back_populates="merchandise", cascade="all, delete-orphan")
     
     def get_data(self):
         """ Chuyển đổi JSON string thành dict """
@@ -210,12 +213,13 @@ class PreQuote(Base):
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
     total_price = Column(Float, nullable=False)
+    installation_type = Column(String(255), nullable=False)
     kind = Column(String(255), nullable=False)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
-    customer = relationship("Customer")
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
     status = Column(String(255), nullable=False, default='pending')
     
-    pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan")
+    customer = relationship("Customer", back_populates="pre_quotes")
+    pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")
 
 class PreQuoteMerchandise(Base):
     __tablename__ = 'pre_quote_merchandises'
@@ -225,7 +229,9 @@ class PreQuoteMerchandise(Base):
     note = Column(String(500))
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
-    merchandise = relationship("Merchandise")
+    merchandise = relationship("Merchandise", back_populates="pre_quote_merchandises")
+    
+    pre_quote = relationship("PreQuote", back_populates="pre_quote_merchandises")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu

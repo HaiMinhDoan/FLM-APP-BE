@@ -13,4 +13,4 @@ app.include_router(pre_quotes.router, prefix="/api", tags=["PreQuote"])
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="localhost", port=8080, reload=True)
+    uvicorn.run("flm_app_api.main:app", host="localhost", port=8080, reload=True)
