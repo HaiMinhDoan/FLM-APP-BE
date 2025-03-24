@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote,Token
+from app.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote,Token
 from typing import List
 
 

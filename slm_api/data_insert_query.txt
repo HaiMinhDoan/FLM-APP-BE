@@ -509,5 +509,3 @@ INSERT INTO merchandises (
 
 insert into customers (name, address,phone, email)
 values('doan minh','hai duong','0889156262','minhdhhe171764@gmail.com');
-
-insert into roles (name) values('admin')

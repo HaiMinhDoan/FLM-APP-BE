@@ -1,9 +1,9 @@
 import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from flm_app_api.model.model import get_db
-from flm_app_api.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository
-from flm_app_api.model.dto import PreQuoteCreateDTO, PreQuoteMerchandiseCreateDTO
+from app.model.model import get_db
+from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository
+from app.model.dto import PreQuoteCreateDTO, PreQuoteMerchandiseCreateDTO
 
 from typing import List
 

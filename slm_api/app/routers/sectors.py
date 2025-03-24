@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from flm_app_api.model.model import get_db, Sector
-from flm_app_api.repository.model_repo import SectorRepository
-from flm_app_api.model.dto import SectorCreateDTO
+from app.model.model import get_db, Sector
+from app.repository.model_repo import SectorRepository
+from app.model.dto import SectorCreateDTO
 from typing import List
 
 

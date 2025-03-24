@@ -7,7 +7,7 @@ from datetime import datetime
 POSTGRES_USER = "postgres"
 POSTGRES_PASSWORD = "0146424Minh"
 POSTGRES_DB = "slm_app"
-POSTGRES_HOST = "localhost"  # Hoặc địa chỉ server PostgreSQL
+POSTGRES_HOST = "host.docker.internal"  # Hoặc địa chỉ server PostgreSQL
 POSTGRES_PORT = "5432"  # Cổng mặc định của PostgreSQL
 
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"

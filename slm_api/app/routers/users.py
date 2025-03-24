@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
-from flm_app_api.model.model import get_db
-from flm_app_api.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository
-from flm_app_api.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
+from app.model.model import get_db
+from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository
+from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from flm_app_api.model.model import get_db, User, Base, Role, LoginHistory, Notification
-from flm_app_api.repository.model_repo import UserRepository
-from flm_app_api.model.dto import UserCreateDTO, UserUpdateDTO
+from app.model.model import get_db, User, Base, Role, LoginHistory, Notification
+from app.repository.model_repo import UserRepository
+from app.model.dto import UserCreateDTO, UserUpdateDTO
 from typing import List
 
 router = APIRouter()
