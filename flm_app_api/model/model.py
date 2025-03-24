@@ -29,13 +29,6 @@ def get_db():
     finally:
         db.close()
         
-# Định nghĩa bảng trung gian user_roles
-user_roles = Table(
-    'user_roles',
-    Base.metadata,
-    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
-    Column('role_id', Integer, ForeignKey('roles.id'), primary_key=True)
-)
 class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -56,7 +49,7 @@ class Role(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
     description = Column(Text)
-    list_users = relationship("User", secondary="user_roles", back_populates="list_roles")
+    list_users = relationship("User", back_populates="role")
 
 class Token(Base):
     __tablename__ = 'tokens'
@@ -104,7 +97,7 @@ class User(Base):
     parent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     
-    list_roles = relationship("Role", secondary="user_roles", back_populates="list_users")
+    role = relationship("Role", back_populates="list_users")
     list_customers = relationship("Customer", back_populates="user")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới Notification

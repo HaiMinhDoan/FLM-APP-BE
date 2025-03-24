@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from flm_app_api.model.model import get_db
-from flm_app_api.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role
-from flm_app_api.model.dto import UserCreateDTO, UserUpdateDTO
+from flm_app_api.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository
+from flm_app_api.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
+from datetime import datetime
 
 router = APIRouter()
 
@@ -131,3 +132,45 @@ def mark_notification_as_read(id: int, notificationId: int, db: Session = Depend
     if not updated_notification:
         raise HTTPException(status_code=404, detail="Notification not found")
     return updated_notification
+@router.post("/users/register", response_model=dict)
+def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
+    """Đăng ký."""
+    # Logic xác thực đăng ký (ví dụ: kiểm tra username/password)
+    finding_user  = UserRepository.get_user_by_phone(db, phone= user_data.phone)
+    if finding_user:
+        raise HTTPException(status_code=404, detail="User existed")
+    new_user = UserRepository.create_user(db, user_data=user_data.dict())
+    if not new_user:
+        raise HTTPException(status_code=404, detail="Create user failed")
+    return {"message": "Register successfully"}
+@router.post("/users/login", response_model=dict)
+def login(user_data: UserLoginDTO, db: Session = Depends(get_db)):
+    """Đăng nhập."""
+    # Logic xác thực đăng nhập (ví dụ: so sánh username/password)
+    finding_user  = UserRepository.get_user_by_phone(db, phone= user_data.username)
+    if not finding_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if finding_user.password != user_data.password:
+        raise HTTPException(status_code=404, detail="Password is incorrect")
+    # Lưu lịch sử đăng nhập
+    token = TokenRepository.get_token_by_user_id(db, finding_user.id)
+    if token:
+        token = TokenRepository.update_token(db, token.id, {"last_modified": datetime.now()})
+    else:
+        token = TokenRepository.create_token(db, {"user_id": finding_user.id, "last_modified": datetime.now(),"phone": finding_user.phone})
+    LoginHistoryRepository.create_login_history(db, {"user_id": finding_user.id, "ip_address": user_data.ip_address, "user_agent": user_data.user_agent})
+    token_dict = token.__dict__.copy()
+    token_dict["role"] = finding_user.role.__dict__.copy()
+    token_dict["role"].pop("_sa_instance_state", None)
+    token_dict.pop("_sa_instance_state", None)
+    return {"message": "Login successfully", "token": token_dict}
+
+@router.get("/users/modify/{id}", response_model=dict)
+def modify_user(id: int, db: Session = Depends(get_db)):
+    """Lấy thông tin tokend."""
+    token = TokenRepository.get_token_by_user_id(db,id)
+    if not token:
+        raise HTTPException(status_code=404, detail="Token not found")
+    token.last_modified = datetime.now()
+    TokenRepository.update_token(db, token.id, token.__dict__)
+    return {"message": "Modify token"}

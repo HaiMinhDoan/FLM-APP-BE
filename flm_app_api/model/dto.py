@@ -1,6 +1,15 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Any, List
 
+
+class UserLoginDTO(BaseModel):
+    """DTO cho việc đăng nhập."""
+    username: str = Field(..., max_length=50, description="Tên đăng nhập")
+    password: str = Field(..., max_length=50, description="Mật khẩu")
+    ip_address: str = Field(..., description="Địa chỉ IP")
+    user_agent: str = Field(..., description="User Agent")
+    
+
 class ResponseDataDTO(BaseModel):
     """DTO cho việc trả về dữ liệu."""
     status: int = Field(..., description="Trạng thái trả về")
@@ -102,12 +111,11 @@ class PriceInfoUpdateDTO(BaseModel):
 
 class UserCreateDTO(BaseModel):
     """DTO cho việc tạo mới User."""
-    username: str = Field(..., max_length=50, description="Tên đăng nhập")
+    name: str = Field(..., max_length=50, description="Tên đăng nhập")
     password: str = Field(..., max_length=50, description="Mật khẩu")
-    full_name: str = Field(..., max_length=255, description="Họ tên")
     email: str = Field(..., max_length=255, description="Email")
     phone: str = Field(..., max_length=20, description="Số điện thoại")
-    role_id: int = Field(..., max_length=50, description="Vai trò")
+    role_id: int = Field(..., description="Vai trò")
 
 class UserUpdateDTO(BaseModel):
     """DTO cho việc cập nhật User."""

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote
+from flm_app_api.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote,Token
 from typing import List
 
 
@@ -35,6 +35,49 @@ class LoginHistoryRepository:
         db.delete(login_history)
         db.commit()
         return True
+    
+class TokenRepository:
+    """Repository cho model Token."""
+
+    @staticmethod
+    def create_token(db: Session, token_data: dict) -> Token:
+        """Tạo một Token mới."""
+        token = Token(**token_data)
+        db.add(token)
+        db.commit()
+        db.refresh(token)
+        return token
+
+    @staticmethod
+    def get_token_by_id(db: Session, token_id: int) -> Token:
+        """Lấy Token theo ID."""
+        return db.query(Token).filter(Token.id == token_id).first()
+
+    @staticmethod
+    def get_token_by_user_id(db: Session, user_id: int) -> Token:
+        """Lấy Token theo User ID."""
+        return db.query(Token).filter(Token.user_id == user_id).first()
+
+    @staticmethod
+    def delete_token(db: Session, token_id: int) -> bool:
+        """Xóa Token theo ID."""
+        token = db.query(Token).filter(Token.id == token_id).first()
+        if not token:
+            return False
+        db.delete(token)
+        db.commit()
+        return True
+    @staticmethod
+    def update_token(db: Session, token_id: int, update_data: dict) -> Token:
+        """Cập nhật Token theo ID."""
+        token = db.query(Token).filter(Token.id == token_id).first()
+        if not token:
+            return None
+        for key, value in update_data.items():
+            setattr(token, key, value)
+        db.commit()
+        db.refresh(token)
+        return token
 
 
 class NotificationRepository:
@@ -101,6 +144,11 @@ class UserRepository:
     def get_user_by_email(db: Session, email: str) -> User:
         """Lấy User theo email."""
         return db.query(User).filter(User.email == email).first()
+    
+    @staticmethod
+    def get_user_by_phone(db: Session, phone: str) -> User:
+        """Lấy User theo phone."""
+        return db.query(User).options(joinedload(User.role)).filter(User.phone == phone).first()
 
     @staticmethod
     def get_all_users(db: Session):
