@@ -42,9 +42,13 @@ def get_all_combo(db: Session = Depends(get_db)):
     combos_dict = []
     for combo in combos:
         combo_dict = combo.__dict__.copy()
+        combo_dict["pre_quote_merchandises"] = []
         for pre_quote_merchandise in combo.pre_quote_merchandises:
             pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
-            pre_quote_merchandise_dict["merchandise"] = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict.pop("_sa_instance_state", None)
+            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
             pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
             pre_quote_merchandise_dict.pop("_sa_instance_state", None)
             # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0

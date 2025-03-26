@@ -7,7 +7,7 @@ from datetime import datetime
 POSTGRES_USER = "postgres"
 POSTGRES_PASSWORD = "0146424Minh"
 POSTGRES_DB = "slm_app"
-POSTGRES_HOST = "172.17.0.1"  # Hoặc địa chỉ server PostgreSQL
+POSTGRES_HOST = "localhost"  # Hoặc địa chỉ server PostgreSQL
 POSTGRES_PORT = "5432"  # Cổng mặc định của PostgreSQL
 
 # DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
@@ -147,6 +147,8 @@ class MerchandiseTemplate(Base):
     sector_id = Column(Integer, ForeignKey('sectors.id'), nullable=False)
     structure_json = Column(Text, nullable=False)  # Mẫu cấu trúc dạng JSON
     sector = relationship('Sector')
+    
+    gm = relationship("GM", back_populates="merchandise_template", cascade="all, delete-orphan")
 
     def get_data_structure(self):
         """ Chuyển đổi JSON string thành dict """
@@ -176,6 +178,7 @@ class Merchandise(Base):
     images = relationship("Image", cascade="all, delete-orphan")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", back_populates="merchandise", cascade="all, delete-orphan")
     
+    
     def get_data(self):
         """ Chuyển đổi JSON string thành dict """
         return json.loads(self.data_json)
@@ -186,15 +189,18 @@ class Image(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     merchandise_id = Column(Integer, ForeignKey("merchandises.id"), nullable=False)
     link = Column(String(800))
-
+class GM(Base):
+    __tablename__ = 'gms'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    merchandise_template_id = Column(Integer, ForeignKey("merchandise_templates.id"), nullable=False, unique=True)
+    gm_value = Column(Float, nullable=False)
+    merchandise_template = relationship("MerchandiseTemplate", back_populates="gm")
+    created_at = Column(DateTime, default=datetime.now)
 class PriceInfo(Base):
     __tablename__ = 'price_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
     merchandise_id = Column(Integer, ForeignKey('merchandises.id'), nullable=False)  # Foreign key to Merchandise
-    import_vat = Column(Float, nullable=False)
-    sale_vat = Column(Float,nullable=False)
-    import_price_non_vat = Column(Float,nullable=False)
-    sale_price_non_vat = Column(Float,nullable=False)
+    import_price_include_vat = Column(Float,nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     
     merchandise = relationship("Merchandise", back_populates="price_infos")  # Liên kết tới Merchandise
@@ -226,6 +232,24 @@ class PreQuoteMerchandise(Base):
     merchandise = relationship("Merchandise", back_populates="pre_quote_merchandises")
     
     pre_quote = relationship("PreQuote", back_populates="pre_quote_merchandises")
+    
+class Content_Category(Base):
+    __tablename__ = 'content_categories'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(255), nullable=False, unique=True)
+    description = Column(Text)
+    
+    contents = relationship("Content", back_populates="category", cascade="all, delete-orphan")
+    
+class Content(Base):
+    __tablename__ = 'contents'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    content = Column(Text, nullable=False)
+    category_id = Column(Integer, ForeignKey('content_categories.id'), nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    
+    category = relationship("Content_Category")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu
