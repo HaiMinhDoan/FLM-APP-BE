@@ -3,13 +3,6 @@ FROM python:3.13
 
 WORKDIR /slm_api
 
-# Cài đặt các dependencies hệ thống
-RUN apt-get update && apt-get install -y \
-    postgresql-client \
-    libpq-dev \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements và cài đặt dependencies
 COPY requirements.txt .
