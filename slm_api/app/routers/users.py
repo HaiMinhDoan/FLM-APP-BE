@@ -14,7 +14,15 @@ router = APIRouter()
 @router.get("/users", response_model=List[dict])
 def get_users(db: Session = Depends(get_db)):
     """Lấy danh sách người dùng."""
-    return UserRepository.get_all_users(db)
+    users_dict = []
+    users = UserRepository.get_all_users(db)
+    for user in users:
+        user_dict = user.__dict__.copy()
+        user_dict["role"] = user.role.__dict__.copy()
+        user_dict["role"].pop("_sa_instance_state", None)
+        user_dict.pop("_sa_instance_state", None)
+        users_dict.append(user_dict)
+    return users_dict
 
 @router.post("/users", response_model=dict)
 def create_user(user_data: UserCreateDTO, db: Session = Depends(get_db)):
