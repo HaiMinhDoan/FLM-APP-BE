@@ -268,6 +268,7 @@ class Content(Base):
     category_id = Column(Integer, ForeignKey('content_categories.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     hashtag = Column(String(500), nullable=True)
+    slug = Column(String(800), nullable=True)
     
     media_contents = relationship("MediaContent", back_populates="content", cascade="all, delete-orphan")
     category = relationship("ContentCategory")
