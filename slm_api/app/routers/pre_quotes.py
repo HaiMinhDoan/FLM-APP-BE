@@ -82,6 +82,8 @@ def get_all_combo(db: Session = Depends(get_db)):
     combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "combo")
     combos_dict = []
     for combo in combos:
+        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
         combo_dict = combo.__dict__.copy()
         combo_dict["pre_quote_merchandises"] = []
         for pre_quote_merchandise in combo.pre_quote_merchandises:
