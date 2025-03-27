@@ -657,7 +657,7 @@ class ContentRepository:
     @staticmethod
     def get_all_contents(db: Session) -> List[Content]:
         """Lấy danh sách tất cả Content."""
-        return db.query(Content).all()
+        return db.query(Content).options(joinedload(Content.media_contents), joinedload(Content.category)).all()
     @staticmethod
     def get_contents_by_hashtag(db: Session, hashtag: str) -> List[Content]:
         """Lấy danh sách tất cả Content theo hashtag."""

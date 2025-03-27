@@ -37,8 +37,8 @@ def get_contents(db: Session = Depends(get_db)):
     contents_dict = []
     for content in contents:
         content_dict = content.__dict__.copy()
-        content_dict["content_category"] = content.content_category.__dict__.copy()
-        content_dict["content_category"].pop("_sa_instance_state", None)
+        content_dict["category"] = content.category.__dict__.copy()
+        content_dict["category"].pop("_sa_instance_state", None)
         content_dict["media_contents"] = []
         for media_content in content.media_contents:
             media_content_dict = media_content.__dict__.copy()
