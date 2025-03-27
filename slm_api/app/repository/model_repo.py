@@ -458,20 +458,20 @@ class PreQuoteRepository:
         return True
 
 
-@staticmethod
-def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
-    """Lấy danh sách PreQuote theo kind, sắp xếp pre_quote_merchandises theo id tăng dần."""
-    return (
-        db.query(PreQuote)
-        .options(
-            joinedload(PreQuote.customer),
-            subqueryload(PreQuote.pre_quote_merchandises)
-            .joinedload(PreQuoteMerchandise.merchandise)
-            .joinedload(Merchandise.images).order_by(PreQuoteMerchandise.id)  # Sắp xếp theo id tăng dần
+    @staticmethod
+    def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
+        """Lấy danh sách PreQuote theo kind, sắp xếp pre_quote_merchandises theo id tăng dần."""
+        return (
+            db.query(PreQuote)
+            .options(
+                joinedload(PreQuote.customer),
+                subqueryload(PreQuote.pre_quote_merchandises)
+                .joinedload(PreQuoteMerchandise.merchandise)
+                .joinedload(Merchandise.images).order_by(PreQuoteMerchandise.id)  # Sắp xếp theo id tăng dần
+            )
+            .filter(PreQuote.kind == kind, PreQuote.status == "accepted")
+            .all()
         )
-        .filter(PreQuote.kind == kind, PreQuote.status == "accepted")
-        .all()
-    )
     
     @staticmethod
     def get_pre_quotes_by_kind_and_installation_type(db: Session, kind: str, installation_type: str) -> List[PreQuote]:
