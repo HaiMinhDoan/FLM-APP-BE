@@ -2,7 +2,7 @@ import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository
+from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository, CustomerRepository, UserRepository
 from app.model.dto import PreQuoteCreateDTO, PreQuoteMerchandiseCreateDTO
 
 from typing import List
@@ -12,16 +12,49 @@ from typing import List
 
 router = APIRouter()
 
+@router.get("/pre_quote/get_one/{id}", response_model=dict)
+def get_pre_quote(id: int, db: Session = Depends(get_db)):
+    print('id', id)
+    """Lấy thông tin combo."""
+    combo = PreQuoteRepository.get_pre_quote_by_id(db, id)
+    print(combo.id)
+    if not combo:
+        raise HTTPException(status_code=404, detail="Combo not found")
+    combo_dict = combo.__dict__.copy()
+    combo_dict["pre_quote_merchandises"] = []
+    for pre_quote_merchandise in combo.pre_quote_merchandises:
+        pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+        merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+        merchandise_dict.pop("_sa_instance_state", None)
+        merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+        pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+        pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+        pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+        combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+    if(combo.customer):
+        combo_dict["customer"] = combo.customer.__dict__.copy()
+        combo_dict["customer"].pop("_sa_instance_state", None)
+    combo_dict.pop("_sa_instance_state", None)
+    return combo_dict
+
 @router.post("/pre_quote", response_model=dict)
 def create_pre_quote(pre_quote_data: PreQuoteCreateDTO, db: Session = Depends(get_db)):
     """Tạo combo mới."""
     total_price = 0
+    if pre_quote_data.customer_id == None and pre_quote_data.kind != "combo":
+        customer = CustomerRepository.create_customer(db, {"name": pre_quote_data.customer_name,
+                                                            "address": pre_quote_data.customer_address,
+                                                            "code": pre_quote_data.customer_code,
+                                                            "user_id": pre_quote_data.sale_id,
+                                                            "phone": pre_quote_data.customer_phone,
+                                                            "email": pre_quote_data.customer_email})
+        pre_quote_data.customer_id = customer.id
     newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={"customer_id": pre_quote_data.customer_id,
                                                                         "code": pre_quote_data.code,
                                                                         "name": pre_quote_data.name,
                                                                         "status": pre_quote_data.status,
                                                                         "installation_type": pre_quote_data.installation_type,
-                                                                        "total_price": pre_quote_data.total_price,
+                                                                        "total_price": 0.0,
                                                                         "kind": pre_quote_data.kind,
                                                                         "description": pre_quote_data.description})
     if not newCombo:
@@ -32,7 +65,16 @@ def create_pre_quote(pre_quote_data: PreQuoteCreateDTO, db: Session = Depends(ge
                                                                         "merchandise_id": pre_quote_merchandise.merchandise_id, 
                                                                         "quantity": pre_quote_merchandise.quantity, 
                                                                         "price": pre_quote_merchandise.price})
+    if pre_quote_data.total_price != None and pre_quote_data.total_price != 0.0:
+        total_price = pre_quote_data.total_price
     PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
+    if pre_quote_data.kind == "contract_quote":
+        customer = CustomerRepository.get_customer_by_id(db, newCombo.customer_id)
+        user = UserRepository.get_user_by_id(db, customer.user_id)
+        UserRepository.update_user(db,customer.user_id,{"total_commission":user.total_commission + total_price*user.commission_rate/100})
+        if user.parent_id != None:
+            parent = UserRepository.get_user_by_id(db, user.parent_id)
+            UserRepository.update_user(db,user.parent_id,{"total_commission":parent.total_commission + total_price/100})
     return {"message": "Combo created successfully"}
 
 @router.get("/pre_quote/combo", response_model=List[dict])

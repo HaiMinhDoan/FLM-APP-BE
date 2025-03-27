@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Any, List
+from datetime import datetime
 
 
 class UserLoginDTO(BaseModel):
@@ -154,10 +155,58 @@ class PreQuoteCreateDTO(BaseModel):
     description: Optional[str] = Field(None, description="Ghi chú")
     code: str = Field(..., description="Mã")
     name: str = Field(..., description="Tên")
-    customer_id: int = Field(..., description="ID của khách hàng")
+    customer_id: Optional[int] = Field(..., description="ID của khách hàng")
+    sale_id: Optional[int] = Field(..., description="ID của nhân viên bán hàng")
+    customer_code : Optional[str] = Field(..., description="Mã khách hàng")
+    customer_name: Optional[str] = Field(..., description="Tên khách hàng")
+    customer_address: Optional[str] = Field(..., description="Địa chỉ khách hàng")
+    customer_phone: Optional[str] = Field(..., description="Số điện thoại khách hàng")
+    customer_email: Optional[str] = Field(..., description="Email khách hàng")
+    customer_tax_code: Optional[str] = Field(..., description="Mã số thuế khách hàng")
     status: str = Field(..., description="Trạng thái")
     installation_type : str = Field(..., description="Loại lắp đặt")
-    total_price: float = Field(..., description="Tổng giá")
+    total_price: Optional[float] = Field(..., description="Tổng giá")
     kind : str = Field(..., description="Loại")
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
+    
+class CustomerCreateDTO(BaseModel):
+    """DTO cho việc tạo mới Customer."""
+    code: Optional[str] = Field(..., max_length=50, description="Mã của Customer")
+    name: Optional[str] = Field(..., max_length=255, description="Tên của Customer")
+    address: Optional[str] = Field(..., description="Địa chỉ của Customer")
+    phone: Optional[str] = Field(..., max_length=20, description="Số điện thoại của Customer")
+    email: Optional[str] = Field(..., max_length=255, description="Email của Customer")
+    tax_code: Optional[str] = Field(..., max_length=50, description="Mã số thuế của Customer")
+    citizen_id: Optional[str] = Field(..., max_length=50, description="Số CMND của Customer")
+    gender: Optional[str] = Field(..., description="Giới tính của Customer")
+    user_id: Optional[int] = Field(..., description="ID của User liên kết")
+    created_at: Optional[datetime] = Field(..., description="Thời gian tạo Customer")
+    description: Optional[str] = Field(None, description="Mô tả của Customer")
+
+
+class ContentCategoryCreateDTO(BaseModel):
+    """DTO cho việc tạo mới ContentCategory."""
+    code: str = Field(..., max_length=50, description="Mã của ContentCategory")
+    name: str = Field(..., max_length=255, description="Tên của ContentCategory")
+    description: Optional[str] = Field(None, description="Mô tả của ContentCategory")
+    
+    
+class MediaContentCreateDTO(BaseModel):
+    """DTO cho việc tạo mới MediaContent."""
+    title: Optional[str] = Field(None, description="Tiêu đề của MediaContent")
+    kind: str = Field(..., description="Loại media")
+    link: str = Field(..., description="Đường dẫn media")
+
+class ContentCreateDTO(BaseModel):
+    """DTO cho việc tạo mới Content."""
+    code: Optional[str] = Field(..., max_length=50, description="Mã của Content")
+    name: Optional[str] = Field(..., max_length=255, description="Tên của Content")
+    description: Optional[str] = Field(None, description="Mô tả của Content")
+    content_category_id: int = Field(..., description="ID của ContentCategory liên kết")
+    title: Optional[str] = Field(None, description="Tiêu đề của Content")
+    hashtag: Optional[str] = Field(None, description="Hashtag của Content")
+    content: Optional[str] = Field(None, description="Nội dung của Content")
+    
+    media_contents: List[MediaContentCreateDTO] = Field(..., description="Danh sách MediaContent")
+

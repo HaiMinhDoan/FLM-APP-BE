@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
-from app.model.model import Merchandise, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory, Role, Supplier,PreQuoteMerchandise, PreQuote,Token
+from app.model.model import MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
+from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory
 from typing import List
 
 
@@ -426,7 +427,7 @@ class PreQuoteRepository:
     @staticmethod
     def get_pre_quote_by_id(db: Session, pre_quote_id: int) -> PreQuote:
         """Lấy PreQuote theo ID."""
-        return db.query(PreQuote).filter(PreQuote.id == pre_quote_id).first()
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise)).filter(PreQuote.id == pre_quote_id).first()
 
     @staticmethod
     def get_all_pre_quotes(db: Session):
@@ -588,5 +589,193 @@ class SectorRepository:
         if not sector:
             return False
         db.delete(sector)
+        db.commit()
+        return True
+    
+
+class CustomerRepository:
+    """Repository cho model Customer."""
+
+    @staticmethod
+    def create_customer(db: Session, customer_data: dict) -> Customer:
+        """Tạo một Customer mới."""
+        customer = Customer(**customer_data)
+        db.add(customer)
+        db.commit()
+        db.refresh(customer)
+        return customer
+
+    @staticmethod
+    def get_customer_by_id(db: Session, customer_id: int) -> Customer:
+        """Lấy Customer theo ID."""
+        return db.query(Customer).filter(Customer.id == customer_id).first()
+
+    @staticmethod
+    def get_all_customers(db: Session) -> List[Customer]:
+        """Lấy danh sách tất cả Customer."""
+        return db.query(Customer).all()
+
+    @staticmethod
+    def update_customer(db: Session, customer_id: int, update_data: dict) -> Customer:
+        """Cập nhật Customer theo ID."""
+        customer = db.query(Customer).filter(Customer.id == customer_id).first()
+        if not customer:
+            return None
+        for key, value in update_data.items():
+            setattr(customer, key, value)
+        db.commit()
+        db.refresh(customer)
+        return customer
+
+    @staticmethod
+    def delete_customer(db: Session, customer_id: int) -> bool:
+        """Xóa Customer theo ID."""
+        customer = db.query(Customer).filter(Customer.id == customer_id).first()
+        if not customer:
+            return False
+        db.delete(customer)
+        db.commit()
+        return True
+
+class ContentRepository:
+    """Repository cho model Content."""
+
+    @staticmethod
+    def create_content(db: Session, content_data: dict) -> Content:
+        """Tạo một Content mới."""
+        content = Content(**content_data)
+        db.add(content)
+        db.commit()
+        db.refresh(content)
+        return content
+
+    @staticmethod
+    def get_content_by_id(db: Session, content_id: int) -> Content:
+        """Lấy Content theo ID."""
+        return db.query(Content).filter(Content.id == content_id).first()
+
+    @staticmethod
+    def get_all_contents(db: Session) -> List[Content]:
+        """Lấy danh sách tất cả Content."""
+        return db.query(Content).all()
+    @staticmethod
+    def get_contents_by_hashtag(db: Session, hashtag: str) -> List[Content]:
+        """Lấy danh sách tất cả Content theo hashtag."""
+        return db.query(Content).filter(hashtag in Content.hashtag).all()
+    @staticmethod
+    def update_content(db: Session, content_id: int, update_data: dict) -> Content:
+        """Cập nhật Content theo ID."""
+        content = db.query(Content).filter(Content.id == content_id).first()
+        if not content:
+            return None
+        for key, value in update_data.items():
+            setattr(content, key, value)
+        db.commit()
+        db.refresh(content)
+        return content
+
+    @staticmethod
+    def delete_content(db: Session, content_id: int) -> bool:
+        """Xóa Content theo ID."""
+        content = db.query(Content).filter(Content.id == content_id).first()
+        if not content:
+            return False
+        db.delete(content)
+        db.commit()
+        return True
+
+class MediaContentRepository:
+    """Repository cho model MediaContent."""
+    @staticmethod
+    def create_media_content(db: Session, media_content_data: dict) -> MediaContent:
+        """Tạo một MediaContent mới."""
+        media_content = MediaContent(**media_content_data)
+        db.add(media_content)
+        db.commit()
+        db.refresh(media_content)
+        return media_content
+
+    @staticmethod
+    def get_media_content_by_id(db: Session, media_content_id: int) -> MediaContent:
+        """Lấy MediaContent theo ID."""
+        return db.query(MediaContent).filter(MediaContent.id == media_content_id).first()
+    
+    @staticmethod
+    def get_media_content_by_content_id(db: Session, content_id: int) -> List[MediaContent]:
+        """Lấy MediaContent theo ID."""
+        return db.query(MediaContent).filter(MediaContent.content_id == content_id).all()
+
+    @staticmethod
+    def get_all_media_contents(db: Session) -> List[MediaContent]:
+        """Lấy danh sách tất cả MediaContent."""
+        return db.query(MediaContent).all()
+
+    @staticmethod
+    def update_media_content(db: Session, media_content_id: int, update_data: dict) -> MediaContent:
+        """Cập nhật MediaContent theo ID."""
+        media_content = db.query(MediaContent).filter(MediaContent.id == media_content_id).first()
+        if not media_content:
+            return None
+        for key, value in update_data.items():
+            setattr(media_content, key, value)
+        db.commit()
+        db.refresh(media_content)
+        return media_content
+
+    @staticmethod
+    def delete_media_content(db: Session, media_content_id: int) -> bool:
+        """Xóa MediaContent theo ID."""
+        media_content = db.query(MediaContent).filter(MediaContent.id == media_content_id).first()
+        if not media_content:
+            return False
+        db.delete(media_content)
+        db.commit()
+        return True
+    
+class ContentCategoryRepository:
+    """Repository cho model ContentCategory."""
+    @staticmethod
+    def create_content_category(db: Session, content_category_data: dict) -> ContentCategory:
+        """Tạo một ContentCategory mới."""
+        content_category = ContentCategory(**content_category_data)
+        db.add(content_category)
+        db.commit()
+        db.refresh(content_category)
+        return content_category
+
+    @staticmethod
+    def get_content_category_by_id(db: Session, content_category_id: int) -> ContentCategory:
+        """Lấy ContentCategory theo ID."""
+        return db.query(ContentCategory).filter(ContentCategory.id == content_category_id).first()
+    
+    @staticmethod
+    def get_content_category_by_content_id(db: Session, content_id: int) -> ContentCategory:
+        """Lấy ContentCategory theo ID."""
+        return db.query(ContentCategory).filter(ContentCategory.content_id == content_id).first()
+
+    @staticmethod
+    def get_all_content_categories(db: Session) -> List[ContentCategory]:
+        """Lấy danh sách tất cả ContentCategory."""
+        return db.query(ContentCategory).all()
+
+    @staticmethod
+    def update_content_category(db: Session, content_category_id: int, update_data: dict) -> ContentCategory:
+        """Cập nhật ContentCategory theo ID."""
+        content_category = db.query(ContentCategory).filter(ContentCategory.id == content_category_id).first()
+        if not content_category:
+            return None
+        for key, value in update_data.items():
+            setattr(content_category, key, value)
+        db.commit()
+        db.refresh(content_category)
+        return content_category
+
+    @staticmethod
+    def delete_content_category(db: Session, content_category_id: int) -> bool:
+        """Xóa ContentCategory theo ID."""
+        content_category = db.query(ContentCategory).filter(ContentCategory.id == content_category_id).first()
+        if not content_category:
+            return False
+        db.delete(content_category)
         db.commit()
         return True

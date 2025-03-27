@@ -33,13 +33,17 @@ def get_db():
 class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    address = Column(String(255), nullable=False)
-    phone = Column(String(16), nullable=False)
-    email = Column(String(255), nullable=False)
+    code = Column(String(50), nullable=True, unique=True)
+    name = Column(String(255), nullable=True)
+    address = Column(String(255), nullable=True)
+    phone = Column(String(16), nullable=True)
+    email = Column(String(255), nullable=True)
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    gender = Column(String(10), nullable=True, default='male')
+    citizen_id = Column(String(50), nullable=True)
+    tax_code = Column(String(50), nullable=True)
     
     user = relationship("User", back_populates="customers")
     pre_quotes = relationship("PreQuote", back_populates="customer")
@@ -97,6 +101,8 @@ class User(Base):
     password = Column(String(255), nullable=False)
     parent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     created_at = Column(DateTime, default=datetime.now)
+    total_commission = Column(Float, default=0.0)
+    commission_rate = Column(Float, default=5.0)
     
     role = relationship("Role", back_populates="list_users")
     list_customers = relationship("Customer", back_populates="user")
@@ -233,13 +239,26 @@ class PreQuoteMerchandise(Base):
     
     pre_quote = relationship("PreQuote", back_populates="pre_quote_merchandises")
     
-class Content_Category(Base):
+class ContentCategory(Base):
     __tablename__ = 'content_categories'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(50), nullable=False, unique=True)
     name = Column(String(255), nullable=False, unique=True)
     description = Column(Text)
     
     contents = relationship("Content", back_populates="category", cascade="all, delete-orphan")
+
+class MediaContent(Base):
+    __tablename__ = 'media_contents'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    kind = Column(String(50), nullable=False)
+    link = Column(String(800), nullable=False)
+    content_id = Column(Integer, ForeignKey('contents.id'), nullable=False)
+    
+    content = relationship("Content", back_populates="media_contents")
+    created_at = Column(DateTime, default=datetime.now)
+    
     
 class Content(Base):
     __tablename__ = 'contents'
@@ -248,8 +267,10 @@ class Content(Base):
     content = Column(Text, nullable=False)
     category_id = Column(Integer, ForeignKey('content_categories.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
+    hashtag = Column(String(500), nullable=True)
     
-    category = relationship("Content_Category")
+    media_contents = relationship("MediaContent", back_populates="content", cascade="all, delete-orphan")
+    category = relationship("ContentCategory")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu
