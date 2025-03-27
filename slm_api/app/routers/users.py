@@ -45,7 +45,11 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user = UserRepository.get_user_by_id(db, id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+    user_dict = user.__dict__.copy()
+    user_dict["role"] = user.role.__dict__.copy()
+    user_dict["role"].pop("_sa_instance_state", None)
+    user_dict.pop("_sa_instance_state", None)
+    return user_dict
 
 @router.put("/users/{id}", response_model=dict)
 def update_user(id: int, user_data: UserUpdateDTO, db: Session = Depends(get_db)):

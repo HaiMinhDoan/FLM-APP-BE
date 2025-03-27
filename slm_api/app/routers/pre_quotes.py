@@ -95,7 +95,7 @@ def get_all_combo(db: Session = Depends(get_db)):
                 image_dict = image.__dict__.copy()
                 image_dict.pop("_sa_instance_state", None)
                 images_dict.append(image_dict)
-            merchandise_dict["images"] = images_dict
+            merchandise_dict["images"] = images_dict.copy()
             pre_quote_merchandise_dict["merchandise"] = merchandise_dict
             pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
             pre_quote_merchandise_dict.pop("_sa_instance_state", None)
