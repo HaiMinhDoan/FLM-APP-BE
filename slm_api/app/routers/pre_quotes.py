@@ -17,7 +17,6 @@ def get_pre_quote(id: int, db: Session = Depends(get_db)):
     print('id', id)
     """Lấy thông tin combo."""
     combo = PreQuoteRepository.get_pre_quote_by_id(db, id)
-    print(combo.id)
     if not combo:
         raise HTTPException(status_code=404, detail="Combo not found")
     combo_dict = combo.__dict__.copy()
