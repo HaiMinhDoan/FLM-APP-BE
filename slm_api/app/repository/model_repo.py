@@ -458,7 +458,7 @@ class PreQuoteRepository:
     @staticmethod
     def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
         """Lấy danh sách PreQuote theo kind."""
-        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise)).filter(PreQuote.kind == kind, PreQuote.status == "accepted" ).all()
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise).joinedload(Merchandise.images)).filter(PreQuote.kind == kind, PreQuote.status == "accepted" ).all()
     
     @staticmethod
     def get_pre_quotes_by_kind_and_installation_type(db: Session, kind: str, installation_type: str) -> List[PreQuote]:
