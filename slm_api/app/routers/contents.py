@@ -53,11 +53,13 @@ def create_content(content_data: ContentCreateDTO, db: Session = Depends(get_db)
     """Tạo Content mới."""
     newContent = ContentRepository.create_content(db, content_data={"title": content_data.title,
                                                                     "content": content_data.content,
-                                                                    "hash_tag": content_data.hash_tag,
-                                                                    "content_category_id": content_data.content_category_id})
+                                                                    "hashtag": content_data.hashtag,
+                                                                    "category_id": content_data.content_category_id})
     if not newContent:
         raise HTTPException(status_code=404, detail="Create content failed")
     for media_content in content_data.media_contents:
-        media_content['content_id'] = newContent.id
-        MediaContentRepository.create_media_content(db, media_content=media_content)
+        MediaContentRepository.create_media_content(db, media_content_data={"content_id": newContent.id,
+                                                                        "kind": media_content.kind,
+                                                                        "link": media_content.link,
+                                                                        "title": media_content.title})
     return {"message": "Content created successfully"}
