@@ -72,12 +72,14 @@ class MerchandiseCreateDTO(BaseModel):
     template_id: int = Field(..., description="ID của MerchandiseTemplate liên kết")
     brand_id: int = Field(..., description="ID của Brand liên kết")
     supplier_id: Optional[int] = Field(None, description="ID của Supplier liên kết")
-    code: int = Field(..., description="Mã của Merchandise")
+    code: str = Field(..., description="Mã của Merchandise")
     name: str = Field(..., max_length=255, description="Tên của Merchandise")
     data_sheet_link: Optional[str] = Field(None, max_length=800, description="Đường dẫn tài liệu kỹ thuật")
     unit: str = Field(..., max_length=50, description="Đơn vị của Merchandise")
     description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
+    images: Optional[List[str]] = Field(None, description="Danh sách đường dẫn hình ảnh của Merchandise")
     data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
+    
 
 
 class MerchandiseUpdateDTO(BaseModel):

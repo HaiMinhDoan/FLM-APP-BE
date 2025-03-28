@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
 from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory
+from app.model.model import Image
 from typing import List
 
 
@@ -315,6 +316,14 @@ class MerchandiseTemplateRepository:
 
 class MerchandiseRepository:
     """Repository cho model Merchandise."""
+    @staticmethod
+    def create_image(db: Session, image_data: dict) -> Image:
+        """Tạo một Image mới."""
+        image = Image(**image_data)
+        db.add(image)
+        db.commit()
+        db.refresh(image)
+        return image
 
     @staticmethod
     def create_merchandise(db: Session, merchandise_data: dict) -> Merchandise:

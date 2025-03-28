@@ -62,6 +62,10 @@ def create_merchandise(merchandise_dto: MerchandiseCreateDTO,db: Session = Depen
     newMerchandise =  MerchandiseRepository.create_merchandise(db, merchandise_data)
     if not newMerchandise:
         raise HTTPException(status_code=404, detail="Create merchandise failed")
+    images = merchandise_dto.images
+    if images:
+        for image in images:
+            MerchandiseRepository.create_image(db, {"merchandise_id": newMerchandise.id, "link": image})
     return {"message": "Merchandise created successfully"}
 
 @router.get("/products", response_model=List[dict])
