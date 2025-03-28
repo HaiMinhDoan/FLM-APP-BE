@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 import json
-from app.routers import users, sectors, pre_quotes, merchandises, agents, customers, contents
+from app.routers import users, sectors, pre_quotes, merchandises, agents, customers, contents, brands
 
 app = FastAPI()
 
@@ -12,6 +12,7 @@ app.include_router(sectors.router, prefix="/api", tags=["Sector"])
 app.include_router(pre_quotes.router, prefix="/api", tags=["PreQuote"])
 app.include_router(customers.router, prefix="/api", tags=["Customer"])
 app.include_router(contents.router, prefix="/api", tags=["Content"])
+app.include_router(brands.router, prefix="/api", tags=["Brand"])
 
 
 if __name__ == "__main__":
