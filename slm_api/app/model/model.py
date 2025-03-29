@@ -122,6 +122,8 @@ class Sector(Base):
     name = Column(String(255), nullable= False)
     description = Column(Text)
     image = Column(String(300))
+    sale_phone = Column(String(16))
+    tech_phone = Column(String(16))
         
 class Supplier(Base):
     __tablename__ = 'suppliers'
@@ -152,9 +154,8 @@ class MerchandiseTemplate(Base):
     name = Column(String(255), nullable=False, unique=True)  # Tên loại vật tư
     sector_id = Column(Integer, ForeignKey('sectors.id'), nullable=False)
     structure_json = Column(Text, nullable=False)  # Mẫu cấu trúc dạng JSON
+    gm = Column(Float, nullable=False)
     sector = relationship('Sector')
-    
-    gm = relationship("GM", back_populates="merchandise_template", cascade="all, delete-orphan")
 
     def get_data_structure(self):
         """ Chuyển đổi JSON string thành dict """
@@ -195,13 +196,6 @@ class Image(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     merchandise_id = Column(Integer, ForeignKey("merchandises.id"), nullable=False)
     link = Column(String(800))
-class GM(Base):
-    __tablename__ = 'gms'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    merchandise_template_id = Column(Integer, ForeignKey("merchandise_templates.id"), nullable=False, unique=True)
-    gm_value = Column(Float, nullable=False)
-    merchandise_template = relationship("MerchandiseTemplate", back_populates="gm")
-    created_at = Column(DateTime, default=datetime.now)
 class PriceInfo(Base):
     __tablename__ = 'price_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -235,6 +229,7 @@ class PreQuoteMerchandise(Base):
     note = Column(String(500))
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
+    gm = Column(Float,nullable=True, default=10)
     merchandise = relationship("Merchandise", back_populates="pre_quote_merchandises")
     
     pre_quote = relationship("PreQuote", back_populates="pre_quote_merchandises")

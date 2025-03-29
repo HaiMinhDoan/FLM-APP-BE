@@ -352,7 +352,7 @@ class MerchandiseRepository:
     @staticmethod
     def get_all_merchandises_with_prices(db: Session):
         """Lấy danh sách tất cả Merchandise cùng với PriceInfo."""
-        return db.query(Merchandise).options(joinedload(Merchandise.price_infos)).all()
+        return db.query(Merchandise).options(joinedload(Merchandise.price_infos), joinedload(Merchandise.template)).all()
 
     @staticmethod
     def update_merchandise(db: Session, merchandise_id: int, update_data: dict) -> Merchandise:

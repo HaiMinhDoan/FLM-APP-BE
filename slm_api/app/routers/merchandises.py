@@ -75,6 +75,10 @@ def get_merchandises(db: Session = Depends(get_db)):
     list_merchandises_dict = []
     for merchandise in list_merchandises:
         merchandise_dict = merchandise.__dict__.copy()
+        template_dict = merchandise_dict["template"].__dict__.copy()
+        template_dict.pop("_sa_instance_state", None)
+        template_dict["structure_json"] = json.loads(template_dict["structure_json"])
+        merchandise_dict["template"] = template_dict
         merchandise_dict.pop("_sa_instance_state", None)
         merchandise_dict["data_json"] = merchandise.get_data()
         list_merchandises_dict.append(merchandise_dict)

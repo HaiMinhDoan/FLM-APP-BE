@@ -78,6 +78,7 @@ class MerchandiseCreateDTO(BaseModel):
     unit: str = Field(..., max_length=50, description="Đơn vị của Merchandise")
     description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
     images: Optional[List[str]] = Field(None, description="Danh sách đường dẫn hình ảnh của Merchandise")
+    begin_margin: Optional[float] = Field(None, description="Biên độ bắt đầu")
     data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
     
 
@@ -150,7 +151,19 @@ class PreQuoteMerchandiseCreateDTO(BaseModel):
     merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
     quantity: int = Field(..., description="Số lượng")
     price: float = Field(..., description="Giá trên đơn vị")
-    gm_price: float = Field(..., description="Giá mua")
+    gm: float = Field(..., description="Giá mua")
+
+class ComboCreateDTO(BaseModel):
+    """DTO cho việc tạo mới Combo."""
+    description: Optional[str] = Field(...,description="Mô tả")
+    code: str = Field(..., description="Mã")
+    name: str = Field(..., description="Tên")
+    status: str = Field(..., description="Trạng thái")
+    installation_type : str = Field(..., description="Loại lắp đặt")
+    total_price: Optional[float] = Field(..., description="Tổng giá")
+    kind : str = Field(..., description="Loại")
+    
+    list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
 
 class PreQuoteCreateDTO(BaseModel):
     """DTO cho việc tạo mới PreQuote."""
@@ -171,6 +184,9 @@ class PreQuoteCreateDTO(BaseModel):
     kind : str = Field(..., description="Loại")
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
+    
+
+
     
 class CustomerCreateDTO(BaseModel):
     """DTO cho việc tạo mới Customer."""
