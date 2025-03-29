@@ -40,27 +40,41 @@ def get_pre_quote(id: int, db: Session = Depends(get_db)):
 def create_combo(pre_quote_data: ComboCreateDTO, db: Session = Depends(get_db)):
     """Tạo combo mới."""
     total_price = 0
-    newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={ "code": pre_quote_data.code,
-                                                                        "name": pre_quote_data.name,
-                                                                        "status": pre_quote_data.status,
-                                                                        "installation_type": pre_quote_data.installation_type,
-                                                                        "total_price": pre_quote_data.total_price,
-                                                                        "kind": "combo",
-                                                                        "description": pre_quote_data.description})
+    try:
+        # Tạo mới combo
+        newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
+            "code": pre_quote_data.code,
+            "name": pre_quote_data.name,
+            "status": pre_quote_data.status,
+            "installation_type": pre_quote_data.installation_type,
+            "total_price": pre_quote_data.total_price,
+            "kind": "combo",
+            "description": pre_quote_data.description
+        })
+    except Exception as e:
+        # Bắt lỗi và trả về thông báo lỗi
+        raise HTTPException(status_code=500, detail=f"Failed to create combo: {str(e)}")
+
     if not newCombo:
-        raise HTTPException(status_code=404, detail="Create combo failed")
+        raise HTTPException(status_code=400, detail="Mã combo bị trùng lặp")
+
+    # Xử lý danh sách pre_quote_merchandises
     for pre_quote_merchandise in pre_quote_data.list_pre_quote_merchandise:
-        total_price += pre_quote_merchandise.price * pre_quote_merchandise.quantity*(100+pre_quote_merchandise.gm)/100
-        PreQuoteMerchandiseRepository.create_pre_quote_merchandise(db, {"pre_quote_id": newCombo.id, 
-                                                                        "merchandise_id": pre_quote_merchandise.merchandise_id,
-                                                                        "quantity": pre_quote_merchandise.quantity, 
-                                                                        "price": pre_quote_merchandise.price,
-                                                                        "gm":pre_quote_merchandise.gm})
-    if pre_quote_data.total_price != None and pre_quote_data.total_price != 0.0:
+        total_price += pre_quote_merchandise.price * pre_quote_merchandise.quantity * (100 + pre_quote_merchandise.gm) / 100
+        PreQuoteMerchandiseRepository.create_pre_quote_merchandise(db, {
+            "pre_quote_id": newCombo.id,
+            "merchandise_id": pre_quote_merchandise.merchandise_id,
+            "quantity": pre_quote_merchandise.quantity,
+            "price": pre_quote_merchandise.price,
+            "gm": pre_quote_merchandise.gm
+        })
+
+    # Cập nhật total_price nếu cần
+    if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
         total_price = pre_quote_data.total_price
     PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
-    return {"message": "Combo created successfully"}
 
+    return {"message": "Combo created successfully"}
 @router.post("/pre_quote/contract_quote", response_model=dict)
 def create_contract_quote(pre_quote_data: PreQuoteCreateDTO, db: Session = Depends(get_db)):
     """Tạo combo mới."""
