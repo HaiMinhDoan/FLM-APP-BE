@@ -14,7 +14,7 @@ class LoginHistoryRepository:
         """Tạo một LoginHistory mới."""
         login_history = LoginHistory(**login_history_data)
         db.add(login_history)
-        db.commit()
+        db.flush()
         db.refresh(login_history)
         return login_history
 
@@ -35,7 +35,7 @@ class LoginHistoryRepository:
         if not login_history:
             return False
         db.delete(login_history)
-        db.commit()
+        db.flush()
         return True
     
 class TokenRepository:
@@ -46,7 +46,7 @@ class TokenRepository:
         """Tạo một Token mới."""
         token = Token(**token_data)
         db.add(token)
-        db.commit()
+        db.flush()
         db.refresh(token)
         return token
 
@@ -67,7 +67,7 @@ class TokenRepository:
         if not token:
             return False
         db.delete(token)
-        db.commit()
+        db.flush()
         return True
     @staticmethod
     def update_token(db: Session, token_id: int, update_data: dict) -> Token:
@@ -77,7 +77,7 @@ class TokenRepository:
             return None
         for key, value in update_data.items():
             setattr(token, key, value)
-        db.commit()
+        db.flush()
         db.refresh(token)
         return token
 
@@ -90,7 +90,7 @@ class NotificationRepository:
         """Tạo một Notification mới."""
         notification = Notification(**notification_data)
         db.add(notification)
-        db.commit()
+        db.flush()
         db.refresh(notification)
         return notification
 
@@ -111,7 +111,7 @@ class NotificationRepository:
         if not notification:
             return None
         notification.is_read = True
-        db.commit()
+        db.flush()
         db.refresh(notification)
         return notification
 
@@ -122,7 +122,7 @@ class NotificationRepository:
         if not notification:
             return False
         db.delete(notification)
-        db.commit()
+        db.flush()
         return True
 
 class UserRepository:
@@ -133,7 +133,7 @@ class UserRepository:
         """Tạo một User mới."""
         user = User(**user_data)
         db.add(user)
-        db.commit()
+        db.flush()
         db.refresh(user)
         return user
 
@@ -156,7 +156,12 @@ class UserRepository:
     def get_all_users(db: Session):
         """Lấy danh sách tất cả User."""
         return db.query(User).all()
-
+    
+    @staticmethod
+    def get_all_sales(db: Session):
+        """Lấy danh sách tất cả User."""
+        return db.query(User).join(Role).filter(Role.name.like('%ad_sale%')).all()
+    
     @staticmethod
     def update_user(db: Session, user_id: int, update_data: dict) -> User:
         """Cập nhật User theo ID."""
@@ -165,7 +170,7 @@ class UserRepository:
             return None
         for key, value in update_data.items():
             setattr(user, key, value)
-        db.commit()
+        db.flush()
         db.refresh(user)
         return user
 
@@ -176,7 +181,7 @@ class UserRepository:
         if not user:
             return False
         db.delete(user)
-        db.commit()
+        db.flush()
         return True
     
 class SectorRepository:
@@ -187,7 +192,7 @@ class SectorRepository:
         """Tạo một Sector mới."""
         sector = Sector(**sector_data)
         db.add(sector)
-        db.commit()
+        db.flush()
         db.refresh(sector)
         return sector
 
@@ -209,7 +214,7 @@ class SectorRepository:
             return None
         for key, value in update_data.items():
             setattr(sector, key, value)
-        db.commit()
+        db.flush()
         db.refresh(sector)
         return sector
 
@@ -220,7 +225,7 @@ class SectorRepository:
         if not sector:
             return False
         db.delete(sector)
-        db.commit()
+        db.flush()
         return True
 
 
@@ -232,7 +237,7 @@ class BrandRepository:
         """Tạo một Brand mới."""
         brand = Brand(**brand_data)
         db.add(brand)
-        db.commit()
+        db.flush()
         db.refresh(brand)
         return brand
 
@@ -254,7 +259,7 @@ class BrandRepository:
             return None
         for key, value in update_data.items():
             setattr(brand, key, value)
-        db.commit()
+        db.flush()
         db.refresh(brand)
         return brand
 
@@ -265,7 +270,7 @@ class BrandRepository:
         if not brand:
             return False
         db.delete(brand)
-        db.commit()
+        db.flush()
         return True
 
 
@@ -277,7 +282,7 @@ class MerchandiseTemplateRepository:
         """Tạo một MerchandiseTemplate mới."""
         template = MerchandiseTemplate(**template_data)
         db.add(template)
-        db.commit()
+        db.flush()
         db.refresh(template)
         return template
 
@@ -305,7 +310,7 @@ class MerchandiseTemplateRepository:
             return None
         for key, value in update_data.items():
             setattr(template, key, value)
-        db.commit()
+        db.flush()
         db.refresh(template)
         return template
 
@@ -316,7 +321,7 @@ class MerchandiseTemplateRepository:
         if not template:
             return False
         db.delete(template)
-        db.commit()
+        db.flush()
         return True
 
 class MerchandiseRepository:
@@ -326,7 +331,7 @@ class MerchandiseRepository:
         """Tạo một Image mới."""
         image = Image(**image_data)
         db.add(image)
-        db.commit()
+        db.flush()
         db.refresh(image)
         return image
 
@@ -335,7 +340,7 @@ class MerchandiseRepository:
         """Tạo một Merchandise mới."""
         merchandise = Merchandise(**merchandise_data)
         db.add(merchandise)
-        db.commit()
+        db.flush()
         db.refresh(merchandise)
         return merchandise
 
@@ -372,7 +377,7 @@ class MerchandiseRepository:
             return None
         for key, value in update_data.items():
             setattr(merchandise, key, value)
-        db.commit()
+        db.flush()
         db.refresh(merchandise)
         return merchandise
 
@@ -383,7 +388,7 @@ class MerchandiseRepository:
         if not merchandise:
             return False
         db.delete(merchandise)
-        db.commit()
+        db.flush()
         return True
 
 
@@ -395,7 +400,7 @@ class PriceInfoRepository:
         """Tạo một PriceInfo mới."""
         price_info = PriceInfo(**price_info_data)
         db.add(price_info)
-        db.commit()
+        db.flush()
         db.refresh(price_info)
         return price_info
 
@@ -417,7 +422,7 @@ class PriceInfoRepository:
             return None
         for key, value in update_data.items():
             setattr(price_info, key, value)
-        db.commit()
+        db.flush()
         db.refresh(price_info)
         return price_info
 
@@ -428,7 +433,7 @@ class PriceInfoRepository:
         if not price_info:
             return False
         db.delete(price_info)
-        db.commit()
+        db.flush()
         return True
     
 class PreQuoteRepository:
@@ -439,8 +444,8 @@ class PreQuoteRepository:
         """Tạo một PreQuote mới."""
         pre_quote = PreQuote(**pre_quote_data)
         db.add(pre_quote)
-        db.commit()
-        db.refresh(pre_quote)
+        db.flush()  # Đảm bảo ID được tạo trước khi refresh
+        db.refresh(pre_quote)  # Tải lại đối tượng từ cơ sở dữ liệu
         return pre_quote
 
     @staticmethod
@@ -461,7 +466,7 @@ class PreQuoteRepository:
             return None
         for key, value in update_data.items():
             setattr(pre_quote, key, value)
-        db.commit()
+        db.flush()
         db.refresh(pre_quote)
         return pre_quote
 
@@ -472,7 +477,7 @@ class PreQuoteRepository:
         if not pre_quote:
             return False
         db.delete(pre_quote)
-        db.commit()
+        db.flush()
         return True
     @staticmethod
     def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
@@ -492,7 +497,7 @@ class PreQuoteMerchandiseRepository:
         """Tạo một PreQuoteMerchandise mới."""
         pre_quote_merchandise = PreQuoteMerchandise(**pre_quote_merchandise_data)
         db.add(pre_quote_merchandise)
-        db.commit()
+        db.flush()
         db.refresh(pre_quote_merchandise)
         return pre_quote_merchandise
 
@@ -514,7 +519,7 @@ class PreQuoteMerchandiseRepository:
             return None
         for key, value in update_data.items():
             setattr(pre_quote_merchandise, key, value)
-        db.commit()
+        db.flush()
         db.refresh(pre_quote_merchandise)
         return pre_quote_merchandise
 
@@ -531,7 +536,7 @@ class RoleRepository:
         """Tạo một Role mới."""
         role = Role(**role_data)
         db.add(role)
-        db.commit()
+        db.flush()
         db.refresh(role)
         return role
 
@@ -553,7 +558,7 @@ class RoleRepository:
             return None
         for key, value in update_data.items():
             setattr(role, key, value)
-        db.commit()
+        db.flush()
         db.refresh(role)
         return role
 
@@ -563,8 +568,8 @@ class RoleRepository:
         role = db.query(Role).filter(Role.id == role_id).first()
         if not role:
             return False
-        db.delete(role)
-        db.commit()
+        db.flush(role)
+        db.flush()
         return True
 
 class SectorRepository:
@@ -575,7 +580,7 @@ class SectorRepository:
         """Tạo một Sector mới."""
         sector = Sector(**sector_data)
         db.add(sector)
-        db.commit()
+        db.flush()
         db.refresh(sector)
         return sector
 
@@ -597,7 +602,7 @@ class SectorRepository:
             return None
         for key, value in update_data.items():
             setattr(sector, key, value)
-        db.commit()
+        db.flush()
         db.refresh(sector)
         return sector
 
@@ -608,7 +613,7 @@ class SectorRepository:
         if not sector:
             return False
         db.delete(sector)
-        db.commit()
+        db.flush()
         return True
     
 
@@ -620,7 +625,7 @@ class CustomerRepository:
         """Tạo một Customer mới."""
         customer = Customer(**customer_data)
         db.add(customer)
-        db.commit()
+        db.flush()
         db.refresh(customer)
         return customer
 
@@ -628,6 +633,11 @@ class CustomerRepository:
     def get_customer_by_id(db: Session, customer_id: int) -> Customer:
         """Lấy Customer theo ID."""
         return db.query(Customer).filter(Customer.id == customer_id).first()
+    
+    @staticmethod
+    def get_customer_by_code(db: Session, code: str) -> Customer:
+        """Lấy Customer theo ID."""
+        return db.query(Customer).filter(Customer.code == code).first()
 
     @staticmethod
     def get_all_customers(db: Session) -> List[Customer]:
@@ -642,7 +652,7 @@ class CustomerRepository:
             return None
         for key, value in update_data.items():
             setattr(customer, key, value)
-        db.commit()
+        db.flush()
         db.refresh(customer)
         return customer
 
@@ -653,7 +663,7 @@ class CustomerRepository:
         if not customer:
             return False
         db.delete(customer)
-        db.commit()
+        db.flush()
         return True
 
 class ContentRepository:
@@ -664,7 +674,7 @@ class ContentRepository:
         """Tạo một Content mới."""
         content = Content(**content_data)
         db.add(content)
-        db.commit()
+        db.flush()
         db.refresh(content)
         return content
 
@@ -689,7 +699,7 @@ class ContentRepository:
             return None
         for key, value in update_data.items():
             setattr(content, key, value)
-        db.commit()
+        db.flush()
         db.refresh(content)
         return content
 
@@ -700,7 +710,7 @@ class ContentRepository:
         if not content:
             return False
         db.delete(content)
-        db.commit()
+        db.flush()
         return True
 
 class MediaContentRepository:
@@ -710,7 +720,7 @@ class MediaContentRepository:
         """Tạo một MediaContent mới."""
         media_content = MediaContent(**media_content_data)
         db.add(media_content)
-        db.commit()
+        db.flush()
         db.refresh(media_content)
         return media_content
 
@@ -737,7 +747,7 @@ class MediaContentRepository:
             return None
         for key, value in update_data.items():
             setattr(media_content, key, value)
-        db.commit()
+        db.flush()
         db.refresh(media_content)
         return media_content
 
@@ -748,7 +758,7 @@ class MediaContentRepository:
         if not media_content:
             return False
         db.delete(media_content)
-        db.commit()
+        db.flush()
         return True
     
 class ContentCategoryRepository:
@@ -758,7 +768,7 @@ class ContentCategoryRepository:
         """Tạo một ContentCategory mới."""
         content_category = ContentCategory(**content_category_data)
         db.add(content_category)
-        db.commit()
+        db.flush()
         db.refresh(content_category)
         return content_category
 
@@ -785,7 +795,7 @@ class ContentCategoryRepository:
             return None
         for key, value in update_data.items():
             setattr(content_category, key, value)
-        db.commit()
+        db.flush()
         db.refresh(content_category)
         return content_category
 
@@ -796,5 +806,5 @@ class ContentCategoryRepository:
         if not content_category:
             return False
         db.delete(content_category)
-        db.commit()
+        db.flush()
         return True

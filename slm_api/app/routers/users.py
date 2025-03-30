@@ -11,6 +11,19 @@ router = APIRouter()
 
 # Quản lý Người dùng
 
+@router.get("/users/sale",response_model=List[dict])
+def get_users(db: Session = Depends(get_db)):
+    """Lấy danh sách người dùng."""
+    users_dict = []
+    users = UserRepository.get_all_sales(db)
+    for user in users:
+        user_dict = user.__dict__.copy()
+        user_dict["role"] = user.role.__dict__.copy()
+        user_dict["role"].pop("_sa_instance_state", None)
+        user_dict.pop("_sa_instance_state", None)
+        users_dict.append(user_dict)
+    return users_dict
+
 @router.get("/users", response_model=List[dict])
 def get_users(db: Session = Depends(get_db)):
     """Lấy danh sách người dùng."""

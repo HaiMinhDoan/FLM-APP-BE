@@ -103,9 +103,10 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now)
     total_commission = Column(Float, default=0.0)
     commission_rate = Column(Float, default=5.0)
+    address = Column(String(100), default="")
+    tax_code = Column(String(100), default="")
     
     role = relationship("Role", back_populates="list_users")
-    list_customers = relationship("Customer", back_populates="user")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới Notification
     list_downline = relationship("User", back_populates="parent", cascade="all, delete-orphan")

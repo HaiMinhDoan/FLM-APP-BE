@@ -165,7 +165,7 @@ class ComboCreateDTO(BaseModel):
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
 
-class PreQuoteCreateDTO(BaseModel):
+class ContractCreateDTO(BaseModel):
     """DTO cho việc tạo mới PreQuote."""
     description: Optional[str] = Field(None, description="Ghi chú")
     code: str = Field(..., description="Mã")
@@ -178,9 +178,9 @@ class PreQuoteCreateDTO(BaseModel):
     customer_phone: Optional[str] = Field(..., description="Số điện thoại khách hàng")
     customer_email: Optional[str] = Field(..., description="Email khách hàng")
     customer_tax_code: Optional[str] = Field(..., description="Mã số thuế khách hàng")
-    status: str = Field(..., description="Trạng thái")
+    status: Optional[str] = Field(..., description="Trạng thái")
     installation_type : str = Field(..., description="Loại lắp đặt")
-    total_price: Optional[float] = Field(..., description="Tổng giá")
+    total_price: Optional[float] = Field(..., description="Tổng giá trị đơn hàng")
     kind : str = Field(..., description="Loại")
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
