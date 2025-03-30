@@ -285,6 +285,11 @@ class MerchandiseTemplateRepository:
     def get_merchandise_template_by_id(db: Session, template_id: int) -> MerchandiseTemplate:
         """Lấy MerchandiseTemplate theo ID."""
         return db.query(MerchandiseTemplate).filter(MerchandiseTemplate.id == template_id).first()
+    
+    @staticmethod
+    def get_merchandise_template_by_code(db: Session, code: str) -> MerchandiseTemplate:
+        """Lấy MerchandiseTemplate theo ID."""
+        return db.query(MerchandiseTemplate).filter(MerchandiseTemplate.code == code).first()
 
     @staticmethod
     def get_all_merchandise_templates(db: Session) -> List[MerchandiseTemplate]:
@@ -338,6 +343,11 @@ class MerchandiseRepository:
     def get_merchandise_by_id(db: Session, merchandise_id: int) -> Merchandise:
         """Lấy Merchandise theo ID."""
         return db.query(Merchandise).filter(Merchandise.id == merchandise_id).first()
+    
+    @staticmethod
+    def get_merchandise_by_code(db: Session, code: str) -> Merchandise:
+        """Lấy Merchandise theo ID."""
+        return db.query(Merchandise).filter(Merchandise.code == code).first()
     
     @staticmethod
     def get_merchandise_by_id_with_all(db: Session, id: int) -> Merchandise:

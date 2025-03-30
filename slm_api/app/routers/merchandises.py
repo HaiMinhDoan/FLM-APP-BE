@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import MerchandiseTemplateRepository, MerchandiseRepository
+from app.repository.model_repo import MerchandiseTemplateRepository, MerchandiseRepository, PriceInfoRepository
 from app.model.dto import MerchandiseTemplateCreateDTO, MerchandiseCreateDTO
 from typing import List
 import json
@@ -46,10 +46,13 @@ def get_merchandise_template(id: int, db: Session = Depends(get_db)):
 def create_merchandise(merchandise_dto: MerchandiseCreateDTO,db: Session = Depends(get_db)):
     """Tạo sản phẩm mới."""
     data_json = ""
+    merchandise_template = MerchandiseTemplateRepository.get_merchandise_template_by_code(db,merchandise_dto.template_code)
+    if not merchandise_template:
+        raise HTTPException(status_code=404, detail="Merchandise not found")
     if merchandise_dto.data_json:
         data_json = json.dumps(merchandise_dto.data_json)
     merchandise_data = {
-        "template_id": merchandise_dto.template_id,
+        "template_id": merchandise_template.id,
         "brand_id": merchandise_dto.brand_id,
         "supplier_id": merchandise_dto.supplier_id,
         "code": merchandise_dto.code,
@@ -62,6 +65,13 @@ def create_merchandise(merchandise_dto: MerchandiseCreateDTO,db: Session = Depen
     newMerchandise =  MerchandiseRepository.create_merchandise(db, merchandise_data)
     if not newMerchandise:
         raise HTTPException(status_code=404, detail="Create merchandise failed")
+    price_info = PriceInfoRepository.create_price_info(db, {
+        "merchandise_id": newMerchandise.id,
+        "import_price_include_vat":merchandise_dto.begin_price
+    }) 
+    if not price_info:
+        raise HTTPException(status_code=404, detail="Create merchandise failed")
+        
     images = merchandise_dto.images
     if images:
         for image in images:
@@ -75,12 +85,25 @@ def get_merchandises(db: Session = Depends(get_db)):
     list_merchandises_dict = []
     for merchandise in list_merchandises:
         merchandise_dict = merchandise.__dict__.copy()
-        template_dict = merchandise_dict["template"].__dict__.copy()
+        merchandise_dict.pop("_sa_instance_state", None)
+        
+        # Process price information
+        price_infos_dict = []
+        for price_info in merchandise.price_infos:
+            price_info_dict = price_info.__dict__.copy()
+            price_info_dict.pop("_sa_instance_state", None)
+            price_infos_dict.append(price_info_dict)
+        merchandise_dict["price_infos"] = price_infos_dict
+        
+        # Process template information
+        template_dict = merchandise.template.__dict__.copy()
         template_dict.pop("_sa_instance_state", None)
         template_dict["structure_json"] = json.loads(template_dict["structure_json"])
         merchandise_dict["template"] = template_dict
-        merchandise_dict.pop("_sa_instance_state", None)
+        
+        # Process data_json
         merchandise_dict["data_json"] = merchandise.get_data()
+        
         list_merchandises_dict.append(merchandise_dict)
     return list_merchandises_dict
 
