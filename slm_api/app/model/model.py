@@ -10,8 +10,8 @@ POSTGRES_DB = "slm_app"
 POSTGRES_HOST = "localhost"  # Hoặc địa chỉ server PostgreSQL
 POSTGRES_PORT = "5432"  # Cổng mặc định của PostgreSQL
 
-DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-# DATABASE_URL = "postgresql://postgres:0146424Minh@i0s0ckccckk4o4k804cc8og8:5432/slm_app"
+# DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+DATABASE_URL = "postgresql://postgres:0146424Minh@i0s0ckccckk4o4k804cc8og8:5432/slm_app"
 
 # Tạo engine kết nối
 engine = create_engine(DATABASE_URL, echo=True)
