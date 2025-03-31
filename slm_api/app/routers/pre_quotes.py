@@ -42,40 +42,45 @@ def create_combo(pre_quote_data: ComboCreateDTO, db: Session = Depends(get_db)):
     """Tạo combo mới."""
     total_price = 0
     try:
-        # Tạo mới combo
-        newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
-            "code": pre_quote_data.code,
-            "name": pre_quote_data.name,
-            "status": pre_quote_data.status,
-            "installation_type": pre_quote_data.installation_type,
-            "total_price": pre_quote_data.total_price,
-            "kind": "combo",
-            "description": pre_quote_data.description
-        })
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Tạo mới combo
+            newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
+                "code": pre_quote_data.code,
+                "name": pre_quote_data.name,
+                "status": pre_quote_data.status,
+                "installation_type": pre_quote_data.installation_type,
+                "total_price": pre_quote_data.total_price,
+                "kind": "combo",
+                "description": pre_quote_data.description
+            })
+
+            if not newCombo:
+                raise HTTPException(status_code=400, detail="Mã combo bị trùng lặp")
+
+            # Xử lý danh sách pre_quote_merchandises
+            for pre_quote_merchandise in pre_quote_data.list_pre_quote_merchandise:
+                total_price += pre_quote_merchandise.price * pre_quote_merchandise.quantity * (100 + pre_quote_merchandise.gm) / 100
+                PreQuoteMerchandiseRepository.create_pre_quote_merchandise(db, {
+                    "pre_quote_id": newCombo.id,
+                    "merchandise_id": pre_quote_merchandise.merchandise_id,
+                    "quantity": pre_quote_merchandise.quantity,
+                    "price": pre_quote_merchandise.price,
+                    "gm": pre_quote_merchandise.gm
+                })
+
+            # Cập nhật total_price nếu cần
+            if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
+                total_price = pre_quote_data.total_price
+            PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
+
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "Combo created successfully"}
     except Exception as e:
-        # Bắt lỗi và trả về thông báo lỗi
+        # Rollback sẽ tự động được thực hiện bởi `db.begin()` nếu có lỗi
+        print("HTTPException occurred:")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to create combo: {str(e)}")
-
-    if not newCombo:
-        raise HTTPException(status_code=400, detail="Mã combo bị trùng lặp")
-
-    # Xử lý danh sách pre_quote_merchandises
-    for pre_quote_merchandise in pre_quote_data.list_pre_quote_merchandise:
-        total_price += pre_quote_merchandise.price * pre_quote_merchandise.quantity * (100 + pre_quote_merchandise.gm) / 100
-        PreQuoteMerchandiseRepository.create_pre_quote_merchandise(db, {
-            "pre_quote_id": newCombo.id,
-            "merchandise_id": pre_quote_merchandise.merchandise_id,
-            "quantity": pre_quote_merchandise.quantity,
-            "price": pre_quote_merchandise.price,
-            "gm": pre_quote_merchandise.gm
-        })
-
-    # Cập nhật total_price nếu cần
-    if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
-        total_price = pre_quote_data.total_price
-    PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
-
-    return {"message": "Combo created successfully"}
 @router.post("/pre_quote/contract_quote/old", response_model=dict)
 def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depends(get_db)):
     """Tạo hợp đồng mới với cơ chế rollback nếu có lỗi."""
