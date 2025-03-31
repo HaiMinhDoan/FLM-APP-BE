@@ -43,40 +43,56 @@ def get_merchandise_template(id: int, db: Session = Depends(get_db)):
     return merchandise
 
 @router.post("/products/add")
-def create_merchandise(merchandise_dto: MerchandiseCreateDTO,db: Session = Depends(get_db)):
+def create_merchandise(merchandise_dto: MerchandiseCreateDTO, db: Session = Depends(get_db)):
     """Tạo sản phẩm mới."""
-    data_json = ""
-    merchandise_template = MerchandiseTemplateRepository.get_merchandise_template_by_code(db,merchandise_dto.template_code)
-    if not merchandise_template:
-        raise HTTPException(status_code=404, detail="Merchandise not found")
-    if merchandise_dto.data_json:
-        data_json = json.dumps(merchandise_dto.data_json)
-    merchandise_data = {
-        "template_id": merchandise_template.id,
-        "brand_id": merchandise_dto.brand_id,
-        "supplier_id": merchandise_dto.supplier_id,
-        "code": merchandise_dto.code,
-        "name": merchandise_dto.name,
-        "data_sheet_link": merchandise_dto.data_sheet_link,
-        "unit": merchandise_dto.unit,
-        "description_in_contract": merchandise_dto.description_in_contract,
-        "data_json": data_json
-    }
-    newMerchandise =  MerchandiseRepository.create_merchandise(db, merchandise_data)
-    if not newMerchandise:
-        raise HTTPException(status_code=404, detail="Create merchandise failed")
-    price_info = PriceInfoRepository.create_price_info(db, {
-        "merchandise_id": newMerchandise.id,
-        "import_price_include_vat":merchandise_dto.begin_price
-    }) 
-    if not price_info:
-        raise HTTPException(status_code=404, detail="Create merchandise failed")
-        
-    images = merchandise_dto.images
-    if images:
-        for image in images:
-            MerchandiseRepository.create_image(db, {"merchandise_id": newMerchandise.id, "link": image})
-    return {"message": "Merchandise created successfully"}
+    try:
+        # Chuẩn bị dữ liệu
+        data_json = ""
+        merchandise_template = MerchandiseTemplateRepository.get_merchandise_template_by_code(db, merchandise_dto.template_code)
+        if not merchandise_template:
+            raise HTTPException(status_code=404, detail="Merchandise template not found")
+        if merchandise_dto.data_json:
+            data_json = json.dumps(merchandise_dto.data_json)
+
+        merchandise_data = {
+            "template_id": merchandise_template.id,
+            "brand_id": merchandise_dto.brand_id,
+            "supplier_id": merchandise_dto.supplier_id,
+            "code": merchandise_dto.code,
+            "name": merchandise_dto.name,
+            "data_sheet_link": merchandise_dto.data_sheet_link,
+            "unit": merchandise_dto.unit,
+            "description_in_contract": merchandise_dto.description_in_contract,
+            "data_json": data_json
+        }
+
+        # Tạo Merchandise
+        newMerchandise = MerchandiseRepository.create_merchandise(db, merchandise_data)
+        if not newMerchandise:
+            raise HTTPException(status_code=500, detail="Failed to create merchandise")
+
+        # Tạo PriceInfo
+        price_info = PriceInfoRepository.create_price_info(db, {
+            "merchandise_id": newMerchandise.id,
+            "import_price_include_vat": merchandise_dto.begin_price
+        })
+        if not price_info:
+            raise HTTPException(status_code=500, detail="Failed to create price info")
+
+        # Tạo danh sách hình ảnh
+        images = merchandise_dto.images
+        if images:
+            for image in images:
+                MerchandiseRepository.create_image(db, {"merchandise_id": newMerchandise.id, "link": image})
+
+        # Commit giao dịch để lưu dữ liệu
+        db.commit()
+
+        return {"message": "Merchandise created successfully"}
+    except Exception as e:
+        # Rollback nếu có lỗi
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating merchandise: {str(e)}")
 
 @router.get("/products", response_model=List[dict])
 def get_merchandises(db: Session = Depends(get_db)):
