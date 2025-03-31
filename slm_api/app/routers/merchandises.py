@@ -98,6 +98,7 @@ def create_merchandise(merchandise_dto: MerchandiseCreateDTO, db: Session = Depe
 def get_merchandises(db: Session = Depends(get_db)):
     """Lấy danh sách sản phẩm."""
     list_merchandises = MerchandiseRepository.get_all_merchandises_with_prices(db)
+    list_merchandises.sort(key=lambda merchandise: merchandise.id)
     list_merchandises_dict = []
     for merchandise in list_merchandises:
         merchandise_dict = merchandise.__dict__.copy()
@@ -116,7 +117,14 @@ def get_merchandises(db: Session = Depends(get_db)):
         template_dict.pop("_sa_instance_state", None)
         template_dict["structure_json"] = json.loads(template_dict["structure_json"])
         merchandise_dict["template"] = template_dict
-        
+        # Process brand information
+        brand_dict = merchandise.brand.__dict__.copy()
+        brand_dict.pop("_sa_instance_state", None)
+        merchandise_dict["brand"] = brand_dict
+        # Process supplier information
+        supplier_dict = merchandise.brand.__dict__.copy()
+        supplier_dict.pop("_sa_instance_state", None)
+        merchandise_dict["supplier"] = supplier_dict
         # Process data_json
         merchandise_dict["data_json"] = merchandise.get_data()
         
