@@ -112,6 +112,7 @@ class User(Base):
     list_downline = relationship("User", back_populates="parent", cascade="all, delete-orphan")
     parent = relationship("User", back_populates="list_downline", remote_side=[id])
     tokens = relationship("Token", back_populates="user", cascade="all, delete-orphan")
+    commissions = relationship("Commissions", back_populates = "user", cascade="all, delete-orphan")
     
     customers = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
     
@@ -122,7 +123,7 @@ class Sector(Base):
     code = Column(String(50), unique=True, nullable=False)
     name = Column(String(255), nullable= False)
     description = Column(Text)
-    image = Column(String(300))
+    image = Column(String(800))
     sale_phone = Column(String(16))
     tech_phone = Column(String(16))
         
@@ -271,12 +272,14 @@ class Content(Base):
     media_contents = relationship("MediaContent", back_populates="content", cascade="all, delete-orphan")
     category = relationship("ContentCategory")
 
-# class Commission(Base):
-#     __tablename__ = 'commissions'
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     money = Column(Float, nullable=True, default=0)
-#     seller = Column(Integer, ForeignKey('users.id'), nullable=False)
-#     created_at = Column(datetime, default=datetime.now)
+class Commission(Base):
+    __tablename__ = 'commissions'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    money = Column(Float, nullable=True, default=0)
+    seller = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    
+    user = relationship("User", back_populates="commissions")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu
