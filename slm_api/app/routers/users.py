@@ -62,6 +62,39 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user_dict["role"] = user.role.__dict__.copy()
     user_dict["role"].pop("_sa_instance_state", None)
     user_dict.pop("_sa_instance_state", None)
+    """Lấy danh sách combo."""
+    combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "contract_quote")
+    # Lọc combo mà có customer.user_id = user_id
+    combos = [combo for combo in combos if combo.customer and combo.customer.user_id == user.id]
+    combos_dict = []
+    for combo in combos:
+        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+        combo_dict = combo.__dict__.copy()
+        combo_dict["pre_quote_merchandises"] = []
+        for pre_quote_merchandise in combo.pre_quote_merchandises:
+            pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict.pop("_sa_instance_state", None)
+            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+            images = pre_quote_merchandise.merchandise.images
+            images_dict = []
+            for image in images:
+                image_dict = image.__dict__.copy()
+                image_dict.pop("_sa_instance_state", None)
+                images_dict.append(image_dict)
+            merchandise_dict["images"] = images_dict.copy()
+            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+            pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+            pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+            # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
+            combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+        if(combo.customer):
+            combo_dict["customer"] = combo.customer.__dict__.copy()
+            combo_dict["customer"].pop("_sa_instance_state", None)
+        combo_dict.pop("_sa_instance_state", None)
+        combos_dict.append(combo_dict)
+    # user_dict["c"]
     return user_dict
 
 @router.put("/users/{id}", response_model=dict)

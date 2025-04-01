@@ -397,7 +397,7 @@ def get_all_combo(user_id:int,db: Session = Depends(get_db)):
     
     return combos_dict
 
-@router.get("/pre_quote/{id}", response_model=dict)
+@router.get("/pre_quote/combo/{id}", response_model=dict)
 def get_combo_by_id(id:int,db: Session = Depends(get_db)):
     merchandise_templates = MerchandiseTemplateRepository.get_all_merchandise_templates
     combo = PreQuoteRepository.get_pre_quote_by_id(db=db,pre_quote_id=id)
@@ -439,9 +439,9 @@ def get_combo_by_id(id:int,db: Session = Depends(get_db)):
         if template_id not in grouped_merchandises:
             grouped_merchandises[template_id] = {
                 "template": pre_quote_merchandise["merchandise"]["template"],
-                "merchandises": []
+                "pre_quote_merchandises": []
             }
-        grouped_merchandises[template_id]["merchandises"].append(pre_quote_merchandise)
+        grouped_merchandises[template_id]["pre_quote_merchandises"].append(pre_quote_merchandise)
 
     combo_dict["grouped_merchandises"] = list(grouped_merchandises.values())
     return combo_dict
