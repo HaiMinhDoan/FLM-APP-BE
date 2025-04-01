@@ -188,7 +188,7 @@ def login(user_data: UserLoginDTO, db: Session = Depends(get_db)):
     token_dict["role"] = finding_user.role.__dict__.copy()
     token_dict["role"].pop("_sa_instance_state", None)
     token_dict.pop("_sa_instance_state", None)
-    return {"message": "Login successfully", "token": token_dict}
+    return {"message": "Login successfully", "token": token_dict, "user_id":finding_user.id}
 
 @router.get("/users/modify/{id}", response_model=dict)
 def modify_user(id: int, db: Session = Depends(get_db)):
