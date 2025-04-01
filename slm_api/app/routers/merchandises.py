@@ -63,7 +63,8 @@ def create_merchandise(merchandise_dto: MerchandiseCreateDTO, db: Session = Depe
             "data_sheet_link": merchandise_dto.data_sheet_link,
             "unit": merchandise_dto.unit,
             "description_in_contract": merchandise_dto.description_in_contract,
-            "data_json": data_json
+            "data_json": data_json,
+            "description_in_quotation" :merchandise_dto.description_in_quotation
         }
 
         # Tạo Merchandise

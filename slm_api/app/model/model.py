@@ -178,6 +178,7 @@ class Merchandise(Base):
     data_json = Column(Text, nullable=False)  # Dữ liệu vật tư dạng JSON
     created_at = Column(DateTime, default=datetime.now)
     active = Column(Boolean, default=True)
+    description_in_quotation = Column(Text, default='', nullable=True) 
     
     template = relationship("MerchandiseTemplate")  # Liên kết tới mẫu
     brand = relationship("Brand") # Liên kết bảng brand

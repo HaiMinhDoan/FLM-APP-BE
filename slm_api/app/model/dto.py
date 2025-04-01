@@ -77,6 +77,7 @@ class MerchandiseCreateDTO(BaseModel):
     data_sheet_link: Optional[str] = Field(None, max_length=800, description="Đường dẫn tài liệu kỹ thuật")
     unit: str = Field(..., max_length=50, description="Đơn vị của Merchandise")
     description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
+    description_in_quotation: str = Field(..., description="Mô tả trong báo giá")
     images: Optional[List[str]] = Field(None, description="Danh sách đường dẫn hình ảnh của Merchandise")
     data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
     begin_price: float = Field(..., description="Giá khời đầu")
