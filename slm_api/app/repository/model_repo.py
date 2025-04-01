@@ -451,7 +451,7 @@ class PreQuoteRepository:
     @staticmethod
     def get_pre_quote_by_id(db: Session, pre_quote_id: int) -> PreQuote:
         """Lấy PreQuote theo ID."""
-        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise)).filter(PreQuote.id == pre_quote_id).first()
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise).joinedload(Merchandise.template)).filter(PreQuote.id == pre_quote_id).first()
 
     @staticmethod
     def get_all_pre_quotes(db: Session):

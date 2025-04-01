@@ -269,6 +269,13 @@ class Content(Base):
     media_contents = relationship("MediaContent", back_populates="content", cascade="all, delete-orphan")
     category = relationship("ContentCategory")
 
+# class Commission(Base):
+#     __tablename__ = 'commissions'
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     money = Column(Float, nullable=True, default=0)
+#     seller = Column(Integer, ForeignKey('users.id'), nullable=False)
+#     created_at = Column(datetime, default=datetime.now)
+
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu
     Base.metadata.create_all(bind=engine)
