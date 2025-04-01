@@ -124,6 +124,7 @@ class Sector(Base):
     name = Column(String(255), nullable= False)
     description = Column(Text)
     image = Column(String(800))
+    image_rectangular = Column(String(800), nullable=True)
     sale_phone = Column(String(16))
     tech_phone = Column(String(16))
         
@@ -221,6 +222,7 @@ class PreQuote(Base):
     customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
     status = Column(String(255), nullable=False, default='pending')
     image = Column(String(800), nullable=True,default='')
+    sector = Column(String(50),nullable=True)
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")

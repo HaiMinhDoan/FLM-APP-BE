@@ -479,6 +479,11 @@ class PreQuoteRepository:
         db.delete(pre_quote)
         db.flush()
         return True
+    
+    @staticmethod
+    def get_pre_quotes_by_kind_and_sector(db: Session, kind: str, sector: str) -> List[PreQuote]:
+        """Lấy danh sách PreQuote theo kind."""
+        return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise).joinedload(Merchandise.images)).filter(PreQuote.kind == kind, PreQuote.status == "accepted", PreQuote.sector == sector ).all()
     @staticmethod
     def get_pre_quotes_by_kind(db: Session, kind: str) -> List[PreQuote]:
         """Lấy danh sách PreQuote theo kind."""
@@ -690,6 +695,17 @@ class ContentRepository:
     def get_all_contents(db: Session) -> List[Content]:
         """Lấy danh sách tất cả Content."""
         return db.query(Content).options(joinedload(Content.media_contents), joinedload(Content.category)).all()
+    
+    @staticmethod
+    def get_all_contents_by_sector(db: Session, sector: str) -> List[Content]:
+        """Lấy danh sách Content mà category.sector chứa một đoạn chuỗi cụ thể."""
+        return (
+            db.query(Content)
+            .join(ContentCategory, Content.category_id == ContentCategory.id)
+            .filter(ContentCategory.sector.like(f"%{sector}%"))
+            .options(joinedload(Content.media_contents), joinedload(Content.category))
+            .all()
+        )
     @staticmethod
     def get_contents_by_hashtag(db: Session, hashtag: str) -> List[Content]:
         """Lấy danh sách tất cả Content theo hashtag."""
