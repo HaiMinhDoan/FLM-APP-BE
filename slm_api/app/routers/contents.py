@@ -6,6 +6,7 @@ from app.repository.model_repo import ContentRepository, ContentCategoryReposito
 from app.model.dto import ContentCreateDTO, MediaContentCreateDTO, ContentCategoryCreateDTO
 
 from typing import List
+import traceback
 
 router = APIRouter()
 
@@ -51,15 +52,32 @@ def get_contents(db: Session = Depends(get_db)):
 @router.post("/content", response_model=dict)
 def create_content(content_data: ContentCreateDTO, db: Session = Depends(get_db)):
     """Tạo Content mới."""
-    newContent = ContentRepository.create_content(db, content_data={"title": content_data.title,
-                                                                    "content": content_data.content,
-                                                                    "hashtag": content_data.hashtag,
-                                                                    "category_id": content_data.content_category_id})
-    if not newContent:
-        raise HTTPException(status_code=404, detail="Create content failed")
-    for media_content in content_data.media_contents:
-        MediaContentRepository.create_media_content(db, media_content_data={"content_id": newContent.id,
-                                                                        "kind": media_content.kind,
-                                                                        "link": media_content.link,
-                                                                        "title": media_content.title})
-    return {"message": "Content created successfully"}
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Tạo Content
+            newContent = ContentRepository.create_content(db, content_data={
+                "title": content_data.title,
+                "content": content_data.content,
+                "hashtag": content_data.hashtag,
+                "category_id": content_data.content_category_id
+            })
+            if not newContent:
+                raise HTTPException(status_code=404, detail="Create content failed")
+
+            # Tạo MediaContent liên quan
+            for media_content in content_data.media_contents:
+                MediaContentRepository.create_media_content(db, media_content_data={
+                    "content_id": newContent.id,
+                    "kind": media_content.kind,
+                    "link": media_content.link,
+                    "title": media_content.title
+                })
+
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "Content created successfully"}
+    except Exception as e:
+        # Rollback sẽ tự động được thực hiện bởi `with db.begin()` nếu có lỗi
+        print("Error occurred while creating content:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error creating content: {str(e)}")

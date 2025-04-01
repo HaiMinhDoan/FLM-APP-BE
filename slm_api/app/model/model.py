@@ -244,7 +244,7 @@ class ContentCategory(Base):
     code = Column(String(50), nullable=False, unique=True)
     name = Column(String(255), nullable=False, unique=True)
     description = Column(Text)
-    
+    sector = Column(String(50), nullable=True, default="SLM")
     contents = relationship("Content", back_populates="category", cascade="all, delete-orphan")
 
 class MediaContent(Base):
@@ -278,7 +278,9 @@ class Commission(Base):
     money = Column(Float, nullable=True, default=0)
     seller = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
+    sector_id = Column(Integer, ForeignKey('sectors.id') , nullable=True)
     
+    sector = relationship("Sector")
     user = relationship("User", back_populates="commissions")
 
 if __name__ == "__main__":

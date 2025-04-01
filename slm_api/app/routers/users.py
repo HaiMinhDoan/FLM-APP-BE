@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository,PreQuoteRepository
+from app.repository.model_repo import Role, TokenRepository,PreQuoteRepository
+from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, CommissionRepository
 from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
@@ -221,39 +222,7 @@ def login(user_data: UserLoginDTO, db: Session = Depends(get_db)):
     token_dict["role"] = finding_user.role.__dict__.copy()
     token_dict["role"].pop("_sa_instance_state", None)
     token_dict.pop("_sa_instance_state", None)
-    """Lấy danh sách combo."""
-    combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "contract_quote")
-    # Lọc combo mà có customer.user_id = user_id
-    combos = [combo for combo in combos if combo.customer and combo.customer.user_id == finding_user.id]
-    combos_dict = []
-    for combo in combos:
-        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
-        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
-        combo_dict = combo.__dict__.copy()
-        combo_dict["pre_quote_merchandises"] = []
-        for pre_quote_merchandise in combo.pre_quote_merchandises:
-            pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
-            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
-            merchandise_dict.pop("_sa_instance_state", None)
-            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
-            images = pre_quote_merchandise.merchandise.images
-            images_dict = []
-            for image in images:
-                image_dict = image.__dict__.copy()
-                image_dict.pop("_sa_instance_state", None)
-                images_dict.append(image_dict)
-            merchandise_dict["images"] = images_dict.copy()
-            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
-            pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
-            pre_quote_merchandise_dict.pop("_sa_instance_state", None)
-            # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
-            combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
-        if(combo.customer):
-            combo_dict["customer"] = combo.customer.__dict__.copy()
-            combo_dict["customer"].pop("_sa_instance_state", None)
-        combo_dict.pop("_sa_instance_state", None)
-        combos_dict.append(combo_dict)
-    return {"message": "Login successfully", "token": token_dict, "user_id":finding_user.id, "contracts":combos_dict}
+    return {"message": "Login successfully", "token": token_dict, "user_id":finding_user.id}
 
 @router.get("/users/modify/{id}", response_model=dict)
 def modify_user(id: int, db: Session = Depends(get_db)):
@@ -264,3 +233,23 @@ def modify_user(id: int, db: Session = Depends(get_db)):
     token.last_modified = datetime.now()
     TokenRepository.update_token(db, token.id, token.__dict__)
     return {"message": "Modify token"}
+
+@router.get("/user/commission/{user_id}/{year}", response_model=List[dict])
+def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(get_db)):
+    """Lấy thông tin hoa hồng theo tháng"""
+    commissions = CommissionRepository.get_commissions_by_user_id(db,user_id=user_id)
+    # lấy commission trong năm và xếp commissions theo tháng
+    commissions_in_year = [commission for commission in commissions if commission.created_at.year >= year]
+    monthly_commissions = {}
+    for commission in commissions_in_year:
+        month = commission.created_at.month
+        if month not in monthly_commissions:
+            monthly_commissions[month] = []
+        monthly_commissions[month].append(commission.__dict__.copy())
+    
+    # Remove SQLAlchemy state from each commission
+    for month in monthly_commissions:
+        for commission in monthly_commissions[month]:
+            commission.pop("_sa_instance_state", None)
+    
+    return [{"month": month, "commissions": monthly_commissions[month]} for month in sorted(monthly_commissions.keys())]

@@ -2,7 +2,8 @@ import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository, CustomerRepository, UserRepository, MerchandiseTemplateRepository
+from app.repository.model_repo import MerchandiseTemplateRepository
+from app.repository.model_repo import  PreQuoteRepository, PreQuoteMerchandiseRepository, CustomerRepository, UserRepository, CommissionRepository
 from app.model.dto import ContractCreateDTO, PreQuoteMerchandiseCreateDTO, ComboCreateDTO
 from typing import List
 import traceback
@@ -280,10 +281,18 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                 UserRepository.update_user(db, customer.user_id, {
                     "total_commission": user.total_commission + total_price * user.commission_rate / 100
                 })
+                CommissionRepository.create_commission(db=db, commission_data = {
+                    "money": total_price * user.commission_rate / 100,
+                    "seller": user.id
+                })
                 if user.parent_id is not None:
                     parent = UserRepository.get_user_by_id(db, user.parent_id)
                     UserRepository.update_user(db, user.parent_id, {
                         "total_commission": parent.total_commission + total_price / 100
+                    })
+                    CommissionRepository.create_commission(db=db, commission_data = {
+                    "money": total_price / 100,
+                    "seller": parent.id
                     })
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error updating user commission: {str(e)}")

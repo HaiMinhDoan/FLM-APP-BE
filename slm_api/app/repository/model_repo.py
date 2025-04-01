@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from app.model.model import MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
+from app.model.model import Commission,MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
 from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory
 from app.model.model import Image
 from typing import List
@@ -809,5 +809,55 @@ class ContentCategoryRepository:
         if not content_category:
             return False
         db.delete(content_category)
+        db.flush()
+        return True
+
+
+class CommissionRepository:
+    """Repository cho model Commission."""
+
+    @staticmethod
+    def create_commission(db: Session, commission_data: dict) -> Commission:
+        """Tạo một Commission mới."""
+        commission = Commission(**commission_data)
+        db.add(commission)
+        db.flush()
+        db.refresh(commission)
+        return commission
+
+    @staticmethod
+    def get_commission_by_id(db: Session, commission_id: int) -> Commission:
+        """Lấy Commission theo ID."""
+        return db.query(Commission).filter(Commission.id == commission_id).first()
+
+    @staticmethod
+    def get_commissions_by_user_id(db: Session, user_id: int) -> List[Commission]:
+        """Lấy danh sách Commission theo User ID."""
+        return db.query(Commission).options(joinedload(Commission.sector)).filter(Commission.seller == user_id).all()
+
+    @staticmethod
+    def get_all_commissions(db: Session) -> List[Commission]:
+        """Lấy danh sách tất cả Commission."""
+        return db.query(Commission).all()
+
+    @staticmethod
+    def update_commission(db: Session, commission_id: int, update_data: dict) -> Commission:
+        """Cập nhật Commission theo ID."""
+        commission = db.query(Commission).filter(Commission.id == commission_id).first()
+        if not commission:
+            return None
+        for key, value in update_data.items():
+            setattr(commission, key, value)
+        db.flush()
+        db.refresh(commission)
+        return commission
+
+    @staticmethod
+    def delete_commission(db: Session, commission_id: int) -> bool:
+        """Xóa Commission theo ID."""
+        commission = db.query(Commission).filter(Commission.id == commission_id).first()
+        if not commission:
+            return False
+        db.delete(commission)
         db.flush()
         return True
