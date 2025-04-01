@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository
+from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, Role, TokenRepository,PreQuoteRepository
 from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
-
+import json
 router = APIRouter()
 
 
@@ -188,7 +188,39 @@ def login(user_data: UserLoginDTO, db: Session = Depends(get_db)):
     token_dict["role"] = finding_user.role.__dict__.copy()
     token_dict["role"].pop("_sa_instance_state", None)
     token_dict.pop("_sa_instance_state", None)
-    return {"message": "Login successfully", "token": token_dict, "user_id":finding_user.id}
+    """Lấy danh sách combo."""
+    combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "contract_quote")
+    # Lọc combo mà có customer.user_id = user_id
+    combos = [combo for combo in combos if combo.customer and combo.customer.user_id == finding_user.id]
+    combos_dict = []
+    for combo in combos:
+        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+        combo_dict = combo.__dict__.copy()
+        combo_dict["pre_quote_merchandises"] = []
+        for pre_quote_merchandise in combo.pre_quote_merchandises:
+            pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict.pop("_sa_instance_state", None)
+            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+            images = pre_quote_merchandise.merchandise.images
+            images_dict = []
+            for image in images:
+                image_dict = image.__dict__.copy()
+                image_dict.pop("_sa_instance_state", None)
+                images_dict.append(image_dict)
+            merchandise_dict["images"] = images_dict.copy()
+            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+            pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+            pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+            # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
+            combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+        if(combo.customer):
+            combo_dict["customer"] = combo.customer.__dict__.copy()
+            combo_dict["customer"].pop("_sa_instance_state", None)
+        combo_dict.pop("_sa_instance_state", None)
+        combos_dict.append(combo_dict)
+    return {"message": "Login successfully", "token": token_dict, "user_id":finding_user.id, "contracts":combos_dict}
 
 @router.get("/users/modify/{id}", response_model=dict)
 def modify_user(id: int, db: Session = Depends(get_db)):
