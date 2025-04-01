@@ -112,7 +112,7 @@ class User(Base):
     list_downline = relationship("User", back_populates="parent", cascade="all, delete-orphan")
     parent = relationship("User", back_populates="list_downline", remote_side=[id])
     tokens = relationship("Token", back_populates="user", cascade="all, delete-orphan")
-    commissions = relationship("Commissions", back_populates = "user", cascade="all, delete-orphan")
+    commissions = relationship("Commission", back_populates = "user", cascade="all, delete-orphan")
     
     customers = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
     
