@@ -42,7 +42,7 @@ def get_merchandise_template(id: int, db: Session = Depends(get_db)):
     merchandise["structure_json"] = json.loads(merchandise["structure_json"])
     return merchandise
 
-@router.post("/products/add")
+@router.post("/products")
 def create_merchandise(merchandise_dto: MerchandiseCreateDTO, db: Session = Depends(get_db)):
     """Tạo sản phẩm mới."""
     try:
