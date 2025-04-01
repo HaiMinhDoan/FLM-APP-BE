@@ -163,6 +163,7 @@ class ComboCreateDTO(BaseModel):
     installation_type : str = Field(..., description="Loại lắp đặt")
     total_price: Optional[float] = Field(..., description="Tổng giá")
     kind : str = Field(..., description="Loại")
+    image: Optional[str] = Field(..., description="Ảnh")
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
 
@@ -183,6 +184,7 @@ class ContractCreateDTO(BaseModel):
     installation_type : str = Field(..., description="Loại lắp đặt")
     total_price: Optional[float] = Field(..., description="Tổng giá trị đơn hàng")
     kind : str = Field(..., description="Loại")
+    image: Optional[str] = Field(..., description="Ảnh")
     
     list_pre_quote_merchandise: List[PreQuoteMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
     

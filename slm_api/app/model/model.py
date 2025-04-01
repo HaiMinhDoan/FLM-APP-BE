@@ -219,6 +219,7 @@ class PreQuote(Base):
     kind = Column(String(255), nullable=False)
     customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
     status = Column(String(255), nullable=False, default='pending')
+    image = Column(String(800), nullable=True,default='')
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")

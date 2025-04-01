@@ -51,7 +51,8 @@ def create_combo(pre_quote_data: ComboCreateDTO, db: Session = Depends(get_db)):
                 "installation_type": pre_quote_data.installation_type,
                 "total_price": pre_quote_data.total_price,
                 "kind": "combo",
-                "description": pre_quote_data.description
+                "description": pre_quote_data.description,
+                "image": pre_quote_data.image
             })
 
             if not newCombo:
@@ -121,7 +122,8 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                     "installation_type": pre_quote_data.installation_type,
                     "total_price": pre_quote_data.total_price,
                     "kind": pre_quote_data.kind,
-                    "description": pre_quote_data.description
+                    "description": pre_quote_data.description,
+                    "image": pre_quote_data.image
                 })
                 if not newCombo:
                     raise HTTPException(status_code=500, detail="Failed to create PreQuote")
@@ -163,6 +165,128 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
             #         })
             # except Exception as e:
             #     raise HTTPException(status_code=500, detail=f"Error updating user commission: {str(e)}")
+
+            # Tạo user mới nếu cần
+            
+            try:
+                    finding_customer_account = UserRepository.get_user_by_phone(db,phone=pre_quote_data.customer_phone)
+                    if not finding_customer_account:
+                        newUser = UserRepository.create_user(db, {
+                        "role_id": 3,
+                        "name": pre_quote_data.customer_name,
+                        "email": pre_quote_data.customer_email,
+                        "phone": pre_quote_data.customer_phone,
+                        "password": "123",
+                        "parent_id": pre_quote_data.sale_id,
+                        "total_commission": 0,
+                        "commission_rate": 0,
+                        "address": pre_quote_data.customer_address,
+                        "tax_code": pre_quote_data.customer_tax_code
+                    })
+                        if not newUser:
+                            raise HTTPException(status_code=500, detail="Failed to create user")
+            except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
+                
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "Contract created successfully"}
+
+    except HTTPException as http_exc:
+        # Rollback sẽ tự động được thực hiện bởi `db.begin()` nếu có lỗi
+        #in lỗi ra terminal
+        print("HTTPException occurred:")
+        traceback.print_exc()
+        raise http_exc
+    except Exception as e:
+        # Rollback sẽ tự động được thực hiện bởi `db.begin()` nếu có lỗi
+        print("HTTPException occurred:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+    
+@router.post("/pre_quote/contract_quote/new", response_model=dict)
+def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = Depends(get_db)):
+    """Tạo hợp đồng mới với cơ chế rollback nếu có lỗi."""
+    total_price = 0
+    customer = None
+
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Tạo khách hàng nếu chưa có
+            if pre_quote_data.customer_id is None:
+                try:
+                    finding_customer = CustomerRepository.get_customer_by_code(db, code = pre_quote_data.customer_code)
+                    if not finding_customer:
+                        customer = CustomerRepository.create_customer(db, {
+                        "name": pre_quote_data.customer_name,
+                        "address": pre_quote_data.customer_address,
+                        "code": pre_quote_data.customer_code,
+                        "user_id": pre_quote_data.sale_id,
+                        "phone": pre_quote_data.customer_phone,
+                        "email": pre_quote_data.customer_email,
+                        "tax_code": pre_quote_data.customer_tax_code
+                        })
+                        if not customer:
+                            raise HTTPException(status_code=500, detail="Failed to create customer")
+                        pre_quote_data.customer_id = customer.id
+                    if finding_customer:
+                        pre_quote_data.customer_id = finding_customer.id
+                except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"Error creating customer: {str(e)}")
+
+            # Tạo PreQuote
+            try:
+                newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
+                    "customer_id": pre_quote_data.customer_id,
+                    "code": pre_quote_data.code,
+                    "name": pre_quote_data.name,
+                    "status": 'accepted',
+                    "installation_type": pre_quote_data.installation_type,
+                    "total_price": pre_quote_data.total_price,
+                    "kind": pre_quote_data.kind,
+                    "description": pre_quote_data.description,
+                    "image": pre_quote_data.image
+                })
+                if not newCombo:
+                    raise HTTPException(status_code=500, detail="Failed to create PreQuote")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error creating PreQuote: {str(e)}")
+
+            # Tạo PreQuoteMerchandise
+            try:
+                for pre_quote_merchandise in pre_quote_data.list_pre_quote_merchandise:
+                    total_price += pre_quote_merchandise.price * pre_quote_merchandise.quantity * (100 + pre_quote_merchandise.gm) / 100
+                    PreQuoteMerchandiseRepository.create_pre_quote_merchandise(db, {
+                        "pre_quote_id": newCombo.id,
+                        "merchandise_id": pre_quote_merchandise.merchandise_id,
+                        "quantity": pre_quote_merchandise.quantity,
+                        "price": pre_quote_merchandise.price
+                    })
+            except Exception as e:
+                print("HTTPException occurred:")
+                traceback.print_exc()
+                raise HTTPException(status_code=500, detail=f"Error creating PreQuoteMerchandise: {str(e)}")
+
+            # Cập nhật total_price nếu cần
+            if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
+                total_price = pre_quote_data.total_price
+            PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
+
+            # Cập nhật thông tin hoa hồng cho user
+            
+            try:
+                customer = CustomerRepository.get_customer_by_id(db, newCombo.customer_id)
+                user = UserRepository.get_user_by_id(db, pre_quote_data.sale_id)
+                UserRepository.update_user(db, customer.user_id, {
+                    "total_commission": user.total_commission + total_price * user.commission_rate / 100
+                })
+                if user.parent_id is not None:
+                    parent = UserRepository.get_user_by_id(db, user.parent_id)
+                    UserRepository.update_user(db, user.parent_id, {
+                        "total_commission": parent.total_commission + total_price / 100
+                    })
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error updating user commission: {str(e)}")
 
             # Tạo user mới nếu cần
             
