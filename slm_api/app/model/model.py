@@ -151,7 +151,7 @@ class Brand(Base):
     code = Column(String(50), unique= True, nullable=False)
     name = Column(String(255), nullable= False)
     description = Column(Text)
-    image = Column(String(300))
+    image = Column(String(1000))
     
 
 
