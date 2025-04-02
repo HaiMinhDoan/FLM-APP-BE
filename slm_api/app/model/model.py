@@ -105,6 +105,12 @@ class User(Base):
     commission_rate = Column(Float, default=5.0)
     address = Column(String(100), default="")
     tax_code = Column(String(100), default="")
+    province = Column(String(100), default="")
+    district = Column(String(100), default="")
+    ward = Column(String(100), default="")
+    gender = Column(Boolean, default=True)
+    code = Column(String(100), default="")
+    citizen_id = Column(String(100), default="")
     
     role = relationship("Role", back_populates="list_users")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
