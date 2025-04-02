@@ -124,7 +124,8 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                     "total_price": pre_quote_data.total_price,
                     "kind": pre_quote_data.kind,
                     "description": pre_quote_data.description,
-                    "image": pre_quote_data.image
+                    "image": pre_quote_data.image,
+                    "created_at": pre_quote_data.created_at
                 })
                 if not newCombo:
                     raise HTTPException(status_code=500, detail="Failed to create PreQuote")
@@ -139,7 +140,8 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                         "pre_quote_id": newCombo.id,
                         "merchandise_id": pre_quote_merchandise.merchandise_id,
                         "quantity": pre_quote_merchandise.quantity,
-                        "price": pre_quote_merchandise.price
+                        "price": pre_quote_merchandise.price,
+                        "warranty_years": pre_quote_merchandise.warranty_years
                     })
             except Exception as e:
                 print("HTTPException occurred:")
@@ -246,7 +248,8 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                     "total_price": pre_quote_data.total_price,
                     "kind": pre_quote_data.kind,
                     "description": pre_quote_data.description,
-                    "image": pre_quote_data.image
+                    "image": pre_quote_data.image,
+                    "created_at": pre_quote_data.created_at
                 })
                 if not newCombo:
                     raise HTTPException(status_code=500, detail="Failed to create PreQuote")
@@ -261,7 +264,8 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                         "pre_quote_id": newCombo.id,
                         "merchandise_id": pre_quote_merchandise.merchandise_id,
                         "quantity": pre_quote_merchandise.quantity,
-                        "price": pre_quote_merchandise.price
+                        "price": pre_quote_merchandise.price,
+                        "warranty_years": pre_quote_merchandise.warranty_years
                     })
             except Exception as e:
                 print("HTTPException occurred:")

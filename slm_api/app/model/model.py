@@ -223,7 +223,7 @@ class PreQuote(Base):
     code = Column(String(50), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=None)
     total_price = Column(Float, nullable=False)
     installation_type = Column(String(255), nullable=False)
     kind = Column(String(255), nullable=False)
@@ -244,7 +244,9 @@ class PreQuoteMerchandise(Base):
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
     gm = Column(Float,nullable=True, default=10)
+    warranty_years = Column(Integer, nullable=True, default=0)
     merchandise = relationship("Merchandise", back_populates="pre_quote_merchandises")
+    
     
     pre_quote = relationship("PreQuote", back_populates="pre_quote_merchandises")
     
