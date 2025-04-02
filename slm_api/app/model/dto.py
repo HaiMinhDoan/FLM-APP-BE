@@ -221,11 +221,8 @@ class MediaContentCreateDTO(BaseModel):
 
 class ContentCreateDTO(BaseModel):
     """DTO cho việc tạo mới Content."""
-    code: Optional[str] = Field(..., max_length=50, description="Mã của Content")
-    name: Optional[str] = Field(..., max_length=255, description="Tên của Content")
-    description: Optional[str] = Field(None, description="Mô tả của Content")
+    title: Optional[str] = Field(..., max_length=250, description="Tiêu đề nội dung")
     content_category_id: int = Field(..., description="ID của ContentCategory liên kết")
-    title: Optional[str] = Field(None, description="Tiêu đề của Content")
     hashtag: Optional[str] = Field(None, description="Hashtag của Content")
     content: Optional[str] = Field(None, description="Nội dung của Content")
     
