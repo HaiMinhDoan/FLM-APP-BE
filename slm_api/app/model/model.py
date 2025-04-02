@@ -158,6 +158,7 @@ class MerchandiseTemplate(Base):
     sector_id = Column(Integer, ForeignKey('sectors.id'), nullable=False)
     structure_json = Column(Text, nullable=False)  # Mẫu cấu trúc dạng JSON
     gm = Column(Float, nullable=False)
+    is_main = Column(Boolean, nullable=True)
     sector = relationship('Sector')
 
     def get_data_structure(self):
