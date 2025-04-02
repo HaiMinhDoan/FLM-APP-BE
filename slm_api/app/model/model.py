@@ -41,9 +41,12 @@ class Customer(Base):
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
-    gender = Column(String(10), nullable=True, default='male')
     citizen_id = Column(String(50), nullable=True)
     tax_code = Column(String(50), nullable=True)
+    province = Column(String(100), nullable=True)
+    district = Column(String(100), nullable=True)
+    ward = Column(String(100), nullable=True)
+    gender = Column(Boolean, nullable=True)
     
     user = relationship("User", back_populates="customers")
     pre_quotes = relationship("PreQuote", back_populates="customer")

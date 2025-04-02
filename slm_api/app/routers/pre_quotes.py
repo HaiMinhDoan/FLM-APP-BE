@@ -103,7 +103,11 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                         "user_id": pre_quote_data.sale_id,
                         "phone": pre_quote_data.customer_phone,
                         "email": pre_quote_data.customer_email,
-                        "tax_code": pre_quote_data.customer_tax_code
+                        "tax_code": pre_quote_data.customer_tax_code,
+                        "province": pre_quote_data.customer_province,
+                        "district": pre_quote_data.customer_district,
+                        "ward": pre_quote_data.customer_ward,
+                        "gender": pre_quote_data.customer_gender
                         })
                         if not customer:
                             raise HTTPException(status_code=500, detail="Failed to create customer")
@@ -184,7 +188,7 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                         "total_commission": 0,
                         "commission_rate": 0,
                         "address": pre_quote_data.customer_address,
-                        "tax_code": pre_quote_data.customer_tax_code
+                        "tax_code": pre_quote_data.customer_tax_code,
                     })
                         if not newUser:
                             raise HTTPException(status_code=500, detail="Failed to create user")
@@ -227,7 +231,11 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                         "user_id": pre_quote_data.sale_id,
                         "phone": pre_quote_data.customer_phone,
                         "email": pre_quote_data.customer_email,
-                        "tax_code": pre_quote_data.customer_tax_code
+                        "tax_code": pre_quote_data.customer_tax_code,
+                        "province": pre_quote_data.customer_province,
+                        "district": pre_quote_data.customer_district,
+                        "ward": pre_quote_data.customer_ward,
+                        "gender": pre_quote_data.customer_gender
                         })
                         if not customer:
                             raise HTTPException(status_code=500, detail="Failed to create customer")
