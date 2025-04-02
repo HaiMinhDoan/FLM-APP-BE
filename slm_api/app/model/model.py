@@ -111,6 +111,7 @@ class User(Base):
     gender = Column(Boolean, default=True)
     code = Column(String(100), default="")
     citizen_id = Column(String(100), default="")
+    avatar = Column(String(1000), default="")
     
     role = relationship("Role", back_populates="list_users")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory

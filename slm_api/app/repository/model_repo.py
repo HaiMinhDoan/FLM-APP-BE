@@ -141,6 +141,11 @@ class UserRepository:
     def get_user_by_id(db: Session, user_id: int) -> User:
         """Lấy User theo ID."""
         return db.query(User).filter(User.id == user_id).first()
+    
+    @staticmethod
+    def get_user_by_parent_id(db: Session, parent_id: int) -> List[User]:
+        """Lấy User theo ID."""
+        return db.query(User).options(joinedload(User.commissions)).filter(User.parent_id == parent_id).all()
 
     @staticmethod
     def get_user_by_email(db: Session, email: str) -> User:
