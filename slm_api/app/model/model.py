@@ -262,6 +262,7 @@ class ContentCategory(Base):
     name = Column(String(255), nullable=False, unique=True)
     description = Column(Text)
     sector = Column(String(50), nullable=True, default="SLM")
+    image = Column(String(1000), nullable=True)
     contents = relationship("Content", back_populates="category", cascade="all, delete-orphan")
 
 class MediaContent(Base):
