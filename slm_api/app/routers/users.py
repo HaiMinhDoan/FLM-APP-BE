@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.model.model import get_db
 from app.repository.model_repo import Role, TokenRepository,PreQuoteRepository
-from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, CommissionRepository
+from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, CommissionRepository, ContentRepository
 from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
@@ -65,7 +65,9 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user_dict.pop("_sa_instance_state", None)
     """Lấy danh sách combo."""
     combos = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db,buyer_id=user.id,sector="SLM")
+    contents = ContentRepository.get_contents_by_hashtag(db=db,hashtag=user.phone)
     combos_dict = []
+    contents_dict = []
     for combo in combos:
         #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
         combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
@@ -98,6 +100,17 @@ def get_user(id: int, db: Session = Depends(get_db)):
         #     combo_dict["pre_quote_merchandises"],
         #     key=lambda x: x["pre_quote_merchandise"]["merchandise"]["template"]["id"]
         # )
+    for content in contents:
+        content_dict = content.__dict__.copy()
+        media_contents = content.media_contents
+        media_contents_dict = []
+        for media_content in media_contents:
+            media_content_dict = media_content.__dict__.copy()
+            media_content_dict.pop("_sa_instance_state", None)
+            media_contents_dict.append(media_content_dict)
+        content_dict["media_contents"] = media_contents_dict
+        content_dict.pop("_sa_instance_state", None)
+        contents_dict.append(content_dict)
     user_dict["contracts"] = combos_dict
     return user_dict
 

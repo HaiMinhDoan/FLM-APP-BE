@@ -758,7 +758,11 @@ class ContentRepository:
     @staticmethod
     def get_contents_by_hashtag(db: Session, hashtag: str) -> List[Content]:
         """Lấy danh sách tất cả Content theo hashtag."""
-        return db.query(Content).filter(hashtag in Content.hashtag).all()
+        return (
+            db.query(Content)
+            .filter(Content.hashtag.like(f"%{hashtag}%"))
+            .all()
+        )
     @staticmethod
     def update_content(db: Session, content_id: int, update_data: dict) -> Content:
         """Cập nhật Content theo ID."""
