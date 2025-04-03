@@ -116,9 +116,33 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                         pre_quote_data.customer_id = finding_customer.id
                 except Exception as e:
                     raise HTTPException(status_code=500, detail=f"Error creating customer: {str(e)}")
+            
+            finding_customer_account = None
+            try:
+                    finding_customer_account = UserRepository.get_user_by_phone(db,phone=pre_quote_data.customer_phone)
+                    if not finding_customer_account:
+                        newUser = UserRepository.create_user(db, {
+                        "role_id": 3,
+                        "name": pre_quote_data.customer_name,
+                        "email": pre_quote_data.customer_email,
+                        "phone": pre_quote_data.customer_phone,
+                        "password": "123",
+                        "parent_id": pre_quote_data.sale_id,
+                        "total_commission": 0,
+                        "commission_rate": 0,
+                        "address": pre_quote_data.customer_address,
+                        "tax_code": pre_quote_data.customer_tax_code,
+                    })
+                        if not newUser:
+                            raise HTTPException(status_code=500, detail="Failed to create user")
+            except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
 
             # Tạo PreQuote
             try:
+                buyer_id = None
+                if finding_customer_account != None:
+                    buyer_id = finding_customer_account.id
                 newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
                     "customer_id": pre_quote_data.customer_id,
                     "code": pre_quote_data.code,
@@ -129,7 +153,8 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                     "kind": pre_quote_data.kind,
                     "description": pre_quote_data.description,
                     "image": pre_quote_data.image,
-                    "created_at": pre_quote_data.created_at
+                    "created_at": pre_quote_data.created_at,
+                    "buyer_id": buyer_id
                 })
                 if not newCombo:
                     raise HTTPException(status_code=500, detail="Failed to create PreQuote")
@@ -175,25 +200,7 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
 
             # Tạo user mới nếu cần
             
-            try:
-                    finding_customer_account = UserRepository.get_user_by_phone(db,phone=pre_quote_data.customer_phone)
-                    if not finding_customer_account:
-                        newUser = UserRepository.create_user(db, {
-                        "role_id": 3,
-                        "name": pre_quote_data.customer_name,
-                        "email": pre_quote_data.customer_email,
-                        "phone": pre_quote_data.customer_phone,
-                        "password": "123",
-                        "parent_id": pre_quote_data.sale_id,
-                        "total_commission": 0,
-                        "commission_rate": 0,
-                        "address": pre_quote_data.customer_address,
-                        "tax_code": pre_quote_data.customer_tax_code,
-                    })
-                        if not newUser:
-                            raise HTTPException(status_code=500, detail="Failed to create user")
-            except Exception as e:
-                    raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
+            
                 
         # Nếu không có lỗi, trả về kết quả thành công
         return {"message": "Contract created successfully"}
@@ -244,9 +251,35 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                         pre_quote_data.customer_id = finding_customer.id
                 except Exception as e:
                     raise HTTPException(status_code=500, detail=f"Error creating customer: {str(e)}")
+                
+            
+            # Tạo user mới nếu cần
+            finding_customer_account = None
+            try:
+                    finding_customer_account = UserRepository.get_user_by_phone(db,phone=pre_quote_data.customer_phone)
+                    if not finding_customer_account:
+                        newUser = UserRepository.create_user(db, {
+                        "role_id": 3,
+                        "name": pre_quote_data.customer_name,
+                        "email": pre_quote_data.customer_email,
+                        "phone": pre_quote_data.customer_phone,
+                        "password": "123",
+                        "parent_id": pre_quote_data.sale_id,
+                        "total_commission": 0,
+                        "commission_rate": 0,
+                        "address": pre_quote_data.customer_address,
+                        "tax_code": pre_quote_data.customer_tax_code
+                    })
+                        if not newUser:
+                            raise HTTPException(status_code=500, detail="Failed to create user")
+            except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
 
             # Tạo PreQuote
             try:
+                buyer_id = None
+                if finding_customer_account != None:
+                    buyer_id = finding_customer_account.id
                 newCombo = PreQuoteRepository.create_pre_quote(db, pre_quote_data={
                     "customer_id": pre_quote_data.customer_id,
                     "code": pre_quote_data.code,
@@ -257,7 +290,8 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                     "kind": pre_quote_data.kind,
                     "description": pre_quote_data.description,
                     "image": pre_quote_data.image,
-                    "created_at": pre_quote_data.created_at
+                    "created_at": pre_quote_data.created_at,
+                    "buyer_id": buyer_id
                 })
                 if not newCombo:
                     raise HTTPException(status_code=500, detail="Failed to create PreQuote")
@@ -309,27 +343,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error updating user commission: {str(e)}")
 
-            # Tạo user mới nếu cần
             
-            try:
-                    finding_customer_account = UserRepository.get_user_by_phone(db,phone=pre_quote_data.customer_phone)
-                    if not finding_customer_account:
-                        newUser = UserRepository.create_user(db, {
-                        "role_id": 3,
-                        "name": pre_quote_data.customer_name,
-                        "email": pre_quote_data.customer_email,
-                        "phone": pre_quote_data.customer_phone,
-                        "password": "123",
-                        "parent_id": pre_quote_data.sale_id,
-                        "total_commission": 0,
-                        "commission_rate": 0,
-                        "address": pre_quote_data.customer_address,
-                        "tax_code": pre_quote_data.customer_tax_code
-                    })
-                        if not newUser:
-                            raise HTTPException(status_code=500, detail="Failed to create user")
-            except Exception as e:
-                    raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
                 
         # Nếu không có lỗi, trả về kết quả thành công
         return {"message": "Contract created successfully"}
@@ -350,6 +364,76 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
 def get_all_combo(db: Session = Depends(get_db)):
     """Lấy danh sách combo."""
     combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "combo")
+    combos_dict = []
+    for combo in combos:
+        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+        combo_dict = combo.__dict__.copy()
+        combo_dict["pre_quote_merchandises"] = []
+        for pre_quote_merchandise in combo.pre_quote_merchandises:
+            pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict.pop("_sa_instance_state", None)
+            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+            images = pre_quote_merchandise.merchandise.images
+            images_dict = []
+            for image in images:
+                image_dict = image.__dict__.copy()
+                image_dict.pop("_sa_instance_state", None)
+                images_dict.append(image_dict)
+            merchandise_dict["images"] = images_dict.copy()
+            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+            pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+            pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+            # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
+            combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+        if(combo.customer):
+            combo_dict["customer"] = combo.customer.__dict__.copy()
+            combo_dict["customer"].pop("_sa_instance_state", None)
+        combo_dict.pop("_sa_instance_state", None)
+        combos_dict.append(combo_dict)
+    
+    return combos_dict
+
+@router.get("/pre_quote/combo/best_selling", response_model=List[dict])
+def get_all_combo(db: Session = Depends(get_db)):
+    """Lấy danh sách combo."""
+    combos = PreQuoteRepository.get_best_selling_combos(db)
+    combos_dict = []
+    for combo in combos:
+        #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+        combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+        combo_dict = combo.__dict__.copy()
+        combo_dict["pre_quote_merchandises"] = []
+        for pre_quote_merchandise in combo.pre_quote_merchandises:
+            pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+            merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+            merchandise_dict.pop("_sa_instance_state", None)
+            merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+            images = pre_quote_merchandise.merchandise.images
+            images_dict = []
+            for image in images:
+                image_dict = image.__dict__.copy()
+                image_dict.pop("_sa_instance_state", None)
+                images_dict.append(image_dict)
+            merchandise_dict["images"] = images_dict.copy()
+            pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+            pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+            pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+            # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
+            combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+        if(combo.customer):
+            combo_dict["customer"] = combo.customer.__dict__.copy()
+            combo_dict["customer"].pop("_sa_instance_state", None)
+        combo_dict.pop("_sa_instance_state", None)
+        combos_dict.append(combo_dict)
+    
+    return combos_dict
+
+@router.get("/pre_quote/contract_quote/{buyer_id}", response_model=List[dict])
+def get_all_combo(buyer_id:int,db: Session = Depends(get_db)):
+    """Lấy danh sách combo."""
+    combos = PreQuoteRepository.get_contract_quote_by_buyer_id(db,buyer_id)
     combos_dict = []
     for combo in combos:
         #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id

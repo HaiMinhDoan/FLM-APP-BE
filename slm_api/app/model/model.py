@@ -234,6 +234,8 @@ class PreQuote(Base):
     status = Column(String(255), nullable=False, default='pending')
     image = Column(String(800), nullable=True,default='')
     sector = Column(String(50),nullable=True)
+    best_selling = Column(Boolean, nullable=True)
+    buyer_id = Column(Integer, nullable= True)
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")
