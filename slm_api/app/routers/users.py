@@ -112,7 +112,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
         content_dict.pop("_sa_instance_state", None)
         contents_dict.append(content_dict)
     user_dict["contracts"] = combos_dict
-    user_dict["contents"] = content_dict
+    user_dict["contents"] = contents_dict
     return user_dict
 
 @router.put("/users/{id}", response_model=dict)
