@@ -298,6 +298,7 @@ class Commission(Base):
     seller = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     sector_id = Column(Integer, ForeignKey('sectors.id') , nullable=True)
+    paid = Column(Boolean,nullable=True, default=False)
     
     sector = relationship("Sector")
     user = relationship("User", back_populates="commissions")

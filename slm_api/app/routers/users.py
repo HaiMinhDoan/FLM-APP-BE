@@ -271,3 +271,6 @@ def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(g
             commission.pop("_sa_instance_state", None)
     
     return [{"month": month, "commissions": monthly_commissions[month]} for month in sorted(monthly_commissions.keys())]
+
+# @router.get("/user/social/{user_id}", response_model= List[dict])
+# def get_us
