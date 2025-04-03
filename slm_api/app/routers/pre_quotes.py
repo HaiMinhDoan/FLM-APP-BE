@@ -71,7 +71,7 @@ def create_combo(pre_quote_data: ComboCreateDTO, db: Session = Depends(get_db)):
                 })
 
             # Cập nhật total_price nếu cần
-            if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
+            if pre_quote_data.total_price != None and pre_quote_data.total_price != 0.0:
                 total_price = pre_quote_data.total_price
             PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
 
@@ -178,7 +178,7 @@ def create_contract_quote(pre_quote_data: ContractCreateDTO, db: Session = Depen
                 raise HTTPException(status_code=500, detail=f"Error creating PreQuoteMerchandise: {str(e)}")
 
             # Cập nhật total_price nếu cần
-            if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
+            if pre_quote_data.total_price != None and pre_quote_data.total_price != 0.0:
                 total_price = pre_quote_data.total_price
             PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
 
@@ -318,7 +318,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                 raise HTTPException(status_code=500, detail=f"Error creating PreQuoteMerchandise: {str(e)}")
 
             # Cập nhật total_price nếu cần
-            if pre_quote_data.total_price is not None and pre_quote_data.total_price != 0.0:
+            if pre_quote_data.total_price != None and pre_quote_data.total_price != 0.0:
                 total_price = pre_quote_data.total_price
             PreQuoteRepository.update_pre_quote(db, newCombo.id, {"total_price": total_price})
 
@@ -334,7 +334,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                     "money": total_price * user.commission_rate / 100,
                     "seller": user.id
                 })
-                if user.parent_id is not None:
+                if user.parent_id !=None:
                     parent = UserRepository.get_user_by_id(db, user.parent_id)
                     UserRepository.update_user(db, user.parent_id, {
                         "total_commission": parent.total_commission + total_price / 100
