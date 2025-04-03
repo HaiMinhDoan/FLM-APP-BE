@@ -332,7 +332,8 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                 })
                 CommissionRepository.create_commission(db=db, commission_data = {
                     "money": total_price * user.commission_rate / 100,
-                    "seller": user.id
+                    "seller": user.id,
+                    "sector_id": 1
                 })
                 if user.parent_id !=None:
                     parent = UserRepository.get_user_by_id(db, user.parent_id)
@@ -341,7 +342,8 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                     })
                     CommissionRepository.create_commission(db=db, commission_data = {
                     "money": total_price / 100,
-                    "seller": parent.id
+                    "seller": parent.id,
+                    "sector_id": 1
                     })
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error updating user commission: {str(e)}")
