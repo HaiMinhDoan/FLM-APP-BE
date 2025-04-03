@@ -64,9 +64,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user_dict["role"].pop("_sa_instance_state", None)
     user_dict.pop("_sa_instance_state", None)
     """Lấy danh sách combo."""
-    combos = PreQuoteRepository.get_pre_quotes_by_kind_and_sector(db, "contract_quote", "SLM")
-    # Lọc combo mà có customer.user_id = user_id
-    combos = [combo for combo in combos if combo.customer and combo.customer.user_id == user.id]
+    combos = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db,buyer_id=user.id,sector="SLM")
     combos_dict = []
     for combo in combos:
         #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
@@ -95,7 +93,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
             combo_dict["customer"].pop("_sa_instance_state", None)
         combo_dict.pop("_sa_instance_state", None)
         combos_dict.append(combo_dict)
-    # user_dict["c"]
+    user_dict["contracts"] = combos_dict
     return user_dict
 
 @router.put("/users/{id}", response_model=dict)
