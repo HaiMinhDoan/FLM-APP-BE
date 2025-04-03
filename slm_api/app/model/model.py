@@ -271,6 +271,7 @@ class MediaContent(Base):
     kind = Column(String(50), nullable=False)
     link = Column(String(800), nullable=False)
     content_id = Column(Integer, ForeignKey('contents.id'), nullable=False)
+    thumbnail = Column(String(1000), nullable=True)
     
     content = relationship("Content", back_populates="media_contents")
     created_at = Column(DateTime, default=datetime.now)
