@@ -3,6 +3,7 @@ from app.model.model import Commission,MediaContent, Merchandise, Content, Price
 from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory
 from app.model.model import Image
 from typing import List
+from sqlalchemy import or_
 
 
 
@@ -164,8 +165,13 @@ class UserRepository:
     
     @staticmethod
     def get_all_sales(db: Session):
-        """Lấy danh sách tất cả User."""
-        return db.query(User).join(Role).filter(Role.name.like('%ad_sale%')).all()
+        """Lấy danh sách tất cả User có Role.name chứa 'ad_sale' hoặc 'agent1'."""
+        return (
+            db.query(User)
+            .join(Role)
+            .filter(or_(Role.name.like('%ad_sale%'), Role.name.like('%agent1%'),Role.name.like('%agent2%')))
+            .all()
+        )
     
     @staticmethod
     def update_user(db: Session, user_id: int, update_data: dict) -> User:
