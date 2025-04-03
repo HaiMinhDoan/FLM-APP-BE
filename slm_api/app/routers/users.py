@@ -94,10 +94,10 @@ def get_user(id: int, db: Session = Depends(get_db)):
         combo_dict.pop("_sa_instance_state", None)
         combos_dict.append(combo_dict)
         #Sắp xếp combo_dict["pre_quote_merchandises"] theo merchandise.template.id
-        combo_dict["pre_quote_merchandises"] = sorted(
-            combo_dict["pre_quote_merchandises"],
-            key=lambda x: x["pre_quote_merchandise"]["merchandise"]["template"]["id"]
-        )
+        # combo_dict["pre_quote_merchandises"] = sorted(
+        #     combo_dict["pre_quote_merchandises"],
+        #     key=lambda x: x["pre_quote_merchandise"]["merchandise"]["template"]["id"]
+        # )
     user_dict["contracts"] = combos_dict
     return user_dict
 
