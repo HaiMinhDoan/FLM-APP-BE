@@ -19,7 +19,7 @@ def get_sectors(db: Session = Depends(get_db)):
 
         for sector in sectors:
             # Lấy danh sách combo theo sector code
-            combos = PreQuoteRepository.get_pre_quotes_by_kind_and_sector(db, kind="combo", sector=sector.code)
+            combos = PreQuoteRepository.get_pre_quotes_by_kind_and_sector(db=db, kind="combo", sector=sector.code)
             contents = ContentRepository.get_all_contents_by_sector(db, sector=sector.code)
             sector_dict = sector.__dict__.copy()
 
