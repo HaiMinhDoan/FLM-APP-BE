@@ -519,7 +519,7 @@ class PreQuoteRepository:
                 PreQuote.best_selling == True ).all()
     
     @staticmethod
-    def get_contract_quote_by_buyer_id(buyer_id:int,db: Session) -> List[PreQuote]:
+    def get_contract_quote_by_buyer_id_and_sector(buyer_id:int,sector:str,db: Session) -> List[PreQuote]:
         """Lấy danh sách PreQuote theo kind."""
         return db.query(PreQuote).options(
             joinedload(PreQuote.customer), 
@@ -528,6 +528,7 @@ class PreQuoteRepository:
             .joinedload(Merchandise.images)).filter(
                 PreQuote.kind == "contract_quote", 
                 PreQuote.status == "accepted", 
+                PreQuote.sector == sector,
                 PreQuote.buyer_id == buyer_id ).all()
     
     @staticmethod

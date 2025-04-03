@@ -64,7 +64,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user_dict["role"].pop("_sa_instance_state", None)
     user_dict.pop("_sa_instance_state", None)
     """Lấy danh sách combo."""
-    combos = PreQuoteRepository.get_pre_quotes_by_kind(db, "contract_quote")
+    combos = PreQuoteRepository.get_pre_quotes_by_kind_and_sector(db, "contract_quote", "SLM")
     # Lọc combo mà có customer.user_id = user_id
     combos = [combo for combo in combos if combo.customer and combo.customer.user_id == user.id]
     combos_dict = []

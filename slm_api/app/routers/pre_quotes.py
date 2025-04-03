@@ -276,6 +276,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                     raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
 
             # Tạo PreQuote
+            newCombo = None
             try:
                 buyer_id = None
                 if finding_customer_account != None:
@@ -433,7 +434,7 @@ def get_all_combo(db: Session = Depends(get_db)):
 @router.get("/pre_quote/contract_quote/{buyer_id}", response_model=List[dict])
 def get_all_combo(buyer_id:int,db: Session = Depends(get_db)):
     """Lấy danh sách combo."""
-    combos = PreQuoteRepository.get_contract_quote_by_buyer_id(db,buyer_id)
+    combos = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db,buyer_id,"SLM")
     combos_dict = []
     for combo in combos:
         #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
