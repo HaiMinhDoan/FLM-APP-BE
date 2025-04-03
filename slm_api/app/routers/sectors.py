@@ -65,6 +65,10 @@ def get_sectors(db: Session = Depends(get_db)):
                     grouped_merchandises[template_id]["pre_quote_merchandises"].append(pre_quote_merchandise)
 
                 combo_dict["grouped_merchandises"] = list(grouped_merchandises.values())
+                #sắp xếp combo_dict["grouped_merchandises"] them template.id
+                combo_dict["grouped_merchandises"] = sorted(
+                    combo_dict["grouped_merchandises"], key=lambda x: x["template"]["id"]
+                )
                 combo_dict["pre_quote_merchandises"] =[]
                 combo_dict.pop("_sa_instance_state", None)
                 combos_dict.append(combo_dict)

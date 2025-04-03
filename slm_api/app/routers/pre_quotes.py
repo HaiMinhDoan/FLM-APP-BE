@@ -227,6 +227,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
         # Bắt đầu giao dịch
         with db.begin():
             # Tạo khách hàng nếu chưa có
+            finding_customer = None
             if pre_quote_data.customer_id is None:
                 try:
                     finding_customer = CustomerRepository.get_customer_by_code(db, code = pre_quote_data.customer_code)
@@ -270,6 +271,7 @@ def create_contract_quote_new(pre_quote_data: ContractCreateDTO, db: Session = D
                         "address": pre_quote_data.customer_address,
                         "tax_code": pre_quote_data.customer_tax_code
                     })
+                        finding_customer_account = newUser
                         if not newUser:
                             raise HTTPException(status_code=500, detail="Failed to create user")
             except Exception as e:
