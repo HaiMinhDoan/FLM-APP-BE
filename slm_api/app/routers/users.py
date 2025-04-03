@@ -256,9 +256,10 @@ def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(g
     """Lấy thông tin hoa hồng theo tháng"""
     commissions = CommissionRepository.get_commissions_by_user_id(db,user_id=user_id)
     # lấy commission trong năm và xếp commissions theo tháng
-    commissions_in_year = [commission for commission in commissions if commission.created_at.year >= year]
+    commissions_in_year = [commission for commission in commissions if commission.created_at.year == year]
     monthly_commissions = {}
     for commission in commissions_in_year:
+        commission.sector = None
         month = commission.created_at.month
         if month not in monthly_commissions:
             monthly_commissions[month] = []
