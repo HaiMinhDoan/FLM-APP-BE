@@ -1057,7 +1057,7 @@ class BannerRepository:
     @staticmethod
     def get_all_banners(db: Session) -> List[Banner]:
         """Lấy danh sách tất cả Banner."""
-        return db.query(Banner).all()
+        return db.query(Banner).options(joinedload(Banner.banner_images)).all()
 
     @staticmethod
     def update_banner(db: Session, banner_id: int, update_data: dict) -> Banner:

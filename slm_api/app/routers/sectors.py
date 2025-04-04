@@ -35,6 +35,7 @@ def get_sectors(db: Session = Depends(get_db)):
                 combo_dict["pre_quote_merchandises"] = []
                 for pre_quote_merchandise in combo.pre_quote_merchandises:
                     pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+                    pre_quote_merchandise_dict["price_on_gm"] = pre_quote_merchandise_dict["price"]/(1-pre_quote_merchandise_dict["gm"]/100)
                     merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
                     merchandise_dict.pop("_sa_instance_state", None)
                     merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
