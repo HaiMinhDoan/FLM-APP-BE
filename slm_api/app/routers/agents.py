@@ -94,6 +94,43 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
     # Giả sử có quan hệ parent_id để xác định cấp dưới
     return children_dict
 
+@router.get("/agents/{id}/old-customer", response_model=List[dict])
+def get_old_customers(id: int, db: Session = Depends(get_db)):
+    """Lấy danh sách đại lý cấp dưới."""
+    children = UserRepository.get_customer_account_by_parent_id(db=db, parent_id=id)
+    #Sắp xếp children bằng tổng hoa hồng kiếm được trong tháng này 
+    # Giả sử có bảng Commission với các cột: user_id, amount, created_at
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+
+    children = sorted(
+        children,
+        key=lambda child: db.query(func.sum(Commission.money))
+        .filter(
+            Commission.seller == child.id,
+            func.extract('month', Commission.created_at) == current_month,
+            func.extract('year', Commission.created_at) == current_year
+        )
+        .scalar() or 0,
+        reverse=True
+    )
+    #chuyển toàn bộ children thành danh sách dict
+    children_dict = []
+    for child in children:
+        child_dict = child.__dict__.copy()
+        commissions = child.commissions
+        commissions_dict = []
+        #hoàn thiện code để có commissions_dict
+        for commission in commissions:
+            commission_dict = commission.__dict__.copy()
+            commission_dict.pop('_sa_instance_state', None)
+            commissions_dict.append(commission_dict)
+        child_dict['commissions'] = commissions_dict
+        child_dict.pop('_sa_instance_state', None)
+        children_dict.append(child_dict)
+    # Giả sử có quan hệ parent_id để xác định cấp dưới
+    return children_dict
+
 @router.get("/agents/{id}/commissions")
 def get_commissions(id: int, db: Session = Depends(get_db)):
     """Lấy thông tin hoa hồng."""

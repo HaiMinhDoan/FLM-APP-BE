@@ -152,6 +152,11 @@ class UserRepository:
     def get_agent_by_parent_id(db: Session, parent_id: int) -> List[User]:
         """Lấy User theo ID."""
         return db.query(User).options(joinedload(User.commissions)).filter(User.parent_id == parent_id, User.role_id != 3).all()
+    
+    @staticmethod
+    def get_customer_account_by_parent_id(db: Session, parent_id: int) -> List[User]:
+        """Lấy User theo ID."""
+        return db.query(User).options(joinedload(User.commissions)).filter(User.parent_id == parent_id, User.role_id == 3).all()
 
     @staticmethod
     def get_user_by_email(db: Session, email: str) -> User:
