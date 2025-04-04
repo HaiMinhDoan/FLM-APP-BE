@@ -312,7 +312,7 @@ class PotentialCustomer(Base):
     name = Column(String(100), nullable=True, default="")
     phone = Column(String(50), nullable=True, default="")
     gender = Column(Boolean, nullable=True, default=True)
-    email = Column(Boolean, nullable=True, default="")
+    email = Column(String(100), nullable=True, default="")
     address = Column(String(300), nullable=True, default="")
     province = Column(String(100), nullable=True, default="")
     district = Column(String(100), nullable=True, default="")
