@@ -230,7 +230,7 @@ class PreQuote(Base):
     total_price = Column(Float, nullable=False)
     installation_type = Column(String(255), nullable=False)
     kind = Column(String(255), nullable=False)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True, default='')
     status = Column(String(255), nullable=False, default='pending')
     image = Column(String(800), nullable=True,default='')
     sector = Column(String(50),nullable=True)
