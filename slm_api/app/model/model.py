@@ -300,6 +300,7 @@ class Commission(Base):
     created_at = Column(DateTime, default=datetime.now)
     sector_id = Column(Integer, ForeignKey('sectors.id') , nullable=True)
     paid = Column(Boolean,nullable=True, default=False)
+    contract_id = Column(Integer, nullable=True)
     
     sector = relationship("Sector")
     user = relationship("User", back_populates="commissions")
