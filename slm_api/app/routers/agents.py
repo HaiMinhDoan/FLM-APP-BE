@@ -174,7 +174,7 @@ def create_new_potential_customer(potential_customer_data: PotentialCustomerCrea
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
     
 #Lấy danh  sách khách hàng tiềm năng của đại lý
-@router.get("/agents/{agent_id}/potential-customers", response_model=List[PotentialCustomerCreateDTO])
+@router.get("/agents/{agent_id}/potential-customers", response_model=List[dict])
 def get_potential_customers(agent_id: int, db: Session = Depends(get_db)):
     """Lấy danh sách khách hàng tiềm năng của đại lý."""
     potential_customers = PotentialCustomerRepository.get_all_potential_customers_by_agent_id(db=db, agent_id=agent_id)
