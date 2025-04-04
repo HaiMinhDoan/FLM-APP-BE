@@ -132,7 +132,7 @@ def get_merchandises(db: Session = Depends(get_db)):
         list_merchandises_dict.append(merchandise_dict)
     return list_merchandises_dict
 
-@router.get("/products/{id}", response_model=dict)
+@router.get("/products/detail/{id}", response_model=dict)
 def get_merchandise(id: int, db: Session = Depends(get_db)):
     """Lấy thông tin sản phẩm."""
     merchandise = MerchandiseRepository.get_merchandise_by_id_with_all(db, id)
