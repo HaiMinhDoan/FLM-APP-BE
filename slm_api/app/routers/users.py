@@ -268,6 +268,22 @@ def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(g
     # Remove SQLAlchemy state from each commission
     for month in monthly_commissions:
         for commission in monthly_commissions[month]:
+            contract = PreQuoteRepository.get_pre_quote_by_id(db, commission["contract_quote_id"])
+            contract_dict = contract.__dict__.copy()
+            contract_dict["pre_quote_merchandises"] = []
+            for pre_quote_merchandise in contract.pre_quote_merchandises:
+                pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+                merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+                merchandise_dict.pop("_sa_instance_state", None)
+                pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+                pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+                contract_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+            buyer = UserRepository.get_user_by_id(db, contract.buyer_id)
+            buyer_dict = buyer.__dict__.copy()
+            buyer_dict.pop("_sa_instance_state", None)
+            contract_dict["buyer"] = buyer_dict
+            contract_dict.pop("_sa_instance_state", None)
+            commission["contract"] = contract_dict
             commission.pop("_sa_instance_state", None)
     
     return [{"month": month, "commissions": monthly_commissions[month]} for month in sorted(monthly_commissions.keys())]
