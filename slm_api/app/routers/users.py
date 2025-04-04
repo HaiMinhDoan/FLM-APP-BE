@@ -109,6 +109,13 @@ def get_user(id: int, db: Session = Depends(get_db)):
             media_content_dict.pop("_sa_instance_state", None)
             media_contents_dict.append(media_content_dict)
         content_dict["media_contents"] = media_contents_dict
+        category = content.category.__dict__.copy()
+        sector = content.category.sector.__dict__.copy()
+        category["sector"] = sector
+        category["sector"].pop("_sa_instance_state", None)
+        category.pop("_sa_instance_state", None)
+        content_dict["category"] = category
+        content_dict["category"].pop("_sa_instance_state", None)
         content_dict.pop("_sa_instance_state", None)
         contents_dict.append(content_dict)
     user_dict["contracts"] = combos_dict

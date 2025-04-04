@@ -770,6 +770,7 @@ class ContentRepository:
         """Lấy danh sách tất cả Content theo hashtag."""
         return (
             db.query(Content)
+            .options(joinedload(Content.media_contents),joinedload(Content.category).joinedload(ContentCategory.sector))
             .filter(Content.hashtag.like(f"%{hashtag}%"))
             .all()
         )
