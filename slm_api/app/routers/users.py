@@ -117,8 +117,6 @@ def get_user(id: int, db: Session = Depends(get_db)):
         category_dict["sector"].pop("_sa_instance_state", None)
         category_dict.pop("_sa_instance_state", None)
         content_dict["category"] = category_dict
-        content_dict["media_contents"] = media_contents_dict
-        content_dict["media_contents"].pop("_sa_instance_state", None)
         content_dict["category"].pop("_sa_instance_state", None)
         content_dict.pop("_sa_instance_state", None)
         contents_dict.append(content_dict)
