@@ -182,4 +182,5 @@ def get_potential_customers(agent_id: int, db: Session = Depends(get_db)):
     for potential_customer in potential_customers:
         potential_customer_dict = potential_customer.__dict__.copy()
         potential_customer_dict.pop('_sa_instance_state', None)
+        potential_customers_dict.append(potential_customer_dict)
     return potential_customers_dict
