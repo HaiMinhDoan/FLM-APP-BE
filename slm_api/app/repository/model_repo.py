@@ -657,7 +657,7 @@ class SectorRepository:
         return db.query(Sector).filter(Sector.id == sector_id).first()
     
     @staticmethod
-    def get_sector_by_id(db: Session, code: str) -> Sector:
+    def get_sector_by_code(db: Session, code: str) -> Sector:
         """Lấy Sector theo ID."""
         return db.query(Sector).filter(Sector.code == code).first()
 
