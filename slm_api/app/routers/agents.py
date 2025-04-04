@@ -60,7 +60,7 @@ def delete_agent(id: int, db: Session = Depends(get_db)):
 @router.get("/agents/{id}/downlines", response_model=List[dict])
 def get_downlines(id: int, db: Session = Depends(get_db)):
     """Lấy danh sách đại lý cấp dưới."""
-    children = UserRepository.get_user_by_parent_id(db=db, parent_id=id)
+    children = UserRepository.get_agent_by_parent_id(db=db, parent_id=id)
     #Sắp xếp children bằng tổng hoa hồng kiếm được trong tháng này 
     # Giả sử có bảng Commission với các cột: user_id, amount, created_at
     current_month = datetime.now().month

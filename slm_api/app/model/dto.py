@@ -178,8 +178,15 @@ class ComboCreateDTO(BaseModel):
     
 class PreQuoteCreateDTO(BaseModel):
     """DTO cho việc tạo mới báo giá khảo sát và báo giá chi tiết."""
-    potential_customer_id: Optional[int] = Field(...,description="ID của khách hàng tiềm năng")
+    agent_id: Optional[int] = Field(...,description="ID của môi giới")
+    phone: Optional[str] = Field(...,description="Số điện thoại của khách hàng tiềm năng")
+    assumed_code: Optional[str] = Field(...,description="Mã giả định của khách hàng tiềm năng")
+    customer_name: Optional[str] = Field(...,description="Tên của khách hàng")
     description: Optional[str] = Field(...,description="Mô tả")
+    address: Optional[str] = Field(...,description="Địa chỉ chi tiết khách hàng")
+    province: Optional[str] = Field(...,description="Tỉnh của khách hàng")
+    district: Optional[str] = Field(...,description="Huyện của khách hàng")
+    ward: Optional[str] = Field(...,description="Phường của khách hàng")
     code: str = Field(..., description="Mã")
     name: str = Field(..., description="Tên")
     status: str = Field(..., description="Trạng thái")

@@ -38,4 +38,22 @@ def  check_exist_potential_customer_by_code(code: str, db: Session = Depends(get
 def create_pre_quote(pre_quote_create_data:PreQuoteCreateDTO,db: Session = Depends(get_db)):
     """Tạo báo giá khảo sát hoặc báo giá khảo sát cho khách hàng tiềm năng"""
     
-    old_potential_customer = PotentialCustomerRepository.get_all_potential_customers_by_assum_code
+    old_potential_customer = PotentialCustomerRepository.get_potential_customer_by_assumed_or_phone(
+        db=db, 
+        phone=pre_quote_create_data.phone,
+        assumed_code=pre_quote_create_data.assumed_code)
+    if not old_potential_customer:
+        new_potential_customer = PotentialCustomerRepository.create_potential_customer(
+            db=db, 
+            potential_customer_data={
+                "agent_id": pre_quote_create_data.agent_id,
+                "name": pre_quote_create_data.name,
+                "phone": pre_quote_create_data.phone,
+                "assumed_code": pre_quote_create_data.assumed_code,
+                "description": pre_quote_create_data.description,
+                "address": pre_quote_create_data.address,
+                "province": pre_quote_create_data.province,
+                "district": pre_quote_create_data.district,
+                "ward": pre_quote_create_data.ward,
+                "name": pre_quote_create_data.customer_name,
+            })

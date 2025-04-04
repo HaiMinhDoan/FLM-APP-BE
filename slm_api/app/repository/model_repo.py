@@ -147,6 +147,11 @@ class UserRepository:
     def get_user_by_parent_id(db: Session, parent_id: int) -> List[User]:
         """Lấy User theo ID."""
         return db.query(User).options(joinedload(User.commissions)).filter(User.parent_id == parent_id).all()
+    
+    @staticmethod
+    def get_agent_by_parent_id(db: Session, parent_id: int) -> List[User]:
+        """Lấy User theo ID."""
+        return db.query(User).options(joinedload(User.commissions)).filter(User.parent_id == parent_id, User.role_id != 3).all()
 
     @staticmethod
     def get_user_by_email(db: Session, email: str) -> User:
@@ -957,9 +962,9 @@ class PotentialCustomerRepository:
         return potential_customer
     
     @staticmethod
-    def get_potential_customer_by_assumedor_phone(db: Session, phone: str) -> PotentialCustomer:
+    def get_potential_customer_by_assumed_or_phone(db: Session, phone:str, assumed_code:str) -> PotentialCustomer:
         """Lấy PotentialCustomer theo điện thoại."""
-        return db.query(PotentialCustomer).filter(PotentialCustomer.phone == phone).first()
+        return db.query(PotentialCustomer).filter(or_(PotentialCustomer.phone == phone, PotentialCustomer.assumed_code == assumed_code)).first()
 
     @staticmethod
     def get_potential_customer_by_id(db: Session, potential_customer_id: int) -> PotentialCustomer:
