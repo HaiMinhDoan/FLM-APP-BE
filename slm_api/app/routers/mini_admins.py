@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import get_db, User, Base, Role, LoginHistory, Notification, Commission, PotentialCustomer
 from app.repository.model_repo import UserRepository, PotentialCustomerRepository
-from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository, PotentialCustomerRepository
+from app.repository.model_repo import PreQuoteRepository, PreQuoteMerchandiseRepository, PotentialCustomerRepository, CustomerRepository
 from app.model.model import PreQuote, PreQuoteMerchandise, PotentialCustomer
 from app.model.dto import UserCreateDTO, UserUpdateDTO, PotentialCustomerCreateDTO, PreQuoteCreateDTO
 from typing import List
@@ -61,8 +61,13 @@ def check_exist_potential_customer_by_phone(phone: str, db: Session = Depends(ge
         user_dict["combos"] = combos_dict.copy()
         user_dict["combos"].sort(key=lambda x: x["created_at"], reverse=True)
         user_dict.pop("_sa_instance_state", None)
+        customer = CustomerRepository.get_customer_by_phone(db=db, phone=phone)
+        customer_dict = None
+        if customer:
+            customer_dict = customer.__dict__.copy()
+            customer_dict.pop("_sa_instance_state", None)
         
-        return {"exist": True, "user": user_dict}
+        return {"exist": True, "user": user_dict, "customer": customer_dict}
     if potential_customer_exist:
         old_pre_quotes = PreQuoteRepository.get_pre_quote_by_potential_customer_id(
             db=db, potential_customer_id=potential_customer_exist.id)

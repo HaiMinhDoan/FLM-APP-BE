@@ -719,6 +719,11 @@ class CustomerRepository:
     def get_customer_by_code(db: Session, code: str) -> Customer:
         """Lấy Customer theo ID."""
         return db.query(Customer).filter(Customer.code == code).first()
+    
+    @staticmethod
+    def get_customer_by_phone(db: Session, phone: str) -> Customer:
+        """Lấy Customer theo ID."""
+        return db.query(Customer).filter(Customer.phone == phone).first()
 
     @staticmethod
     def get_all_customers(db: Session) -> List[Customer]:
