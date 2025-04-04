@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import Commission,MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
-from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory
+from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory, PotentialCustomer
 from app.model.model import Image
 from typing import List
 from sqlalchemy import or_
@@ -928,5 +928,72 @@ class CommissionRepository:
         if not commission:
             return False
         db.delete(commission)
+        db.flush()
+        return True
+
+class PotentialCustomerRepository:
+    """PotentialCustomerRepository thao tác dữ liệu với bảng PotentialCustomer"""
+    @staticmethod
+    def get_one_potential_customers_by_assumed_code(db: Session, code:str) -> List[PotentialCustomer]:
+        """Lấy tất cả những khách hàng tiềm năng của agent có id là agent_id"""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.assumed_code == code).all()
+    @staticmethod
+    def get_all_potential_customers_by_agent_id(db: Session, agent_id:int) -> List[PotentialCustomer]:
+        """Lấy tất cả những khách hàng tiềm năng của agent có id là agent_id"""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.agent_id == agent_id).all()
+    
+    @staticmethod
+    def create_potential_customer(db: Session, potential_customer_data: dict) -> PotentialCustomer:
+        """Tạo một PotentialCustomer mới."""
+        potential_customer = PotentialCustomer(**potential_customer_data)
+        db.add(potential_customer)
+        db.flush()
+        db.refresh(potential_customer)
+        return potential_customer
+    
+    @staticmethod
+    def get_potential_customer_by_assumedor_phone(db: Session, phone: str) -> PotentialCustomer:
+        """Lấy PotentialCustomer theo điện thoại."""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.phone == phone).first()
+
+    @staticmethod
+    def get_potential_customer_by_id(db: Session, potential_customer_id: int) -> PotentialCustomer:
+        """Lấy PotentialCustomer theo ID."""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.id == potential_customer_id).first()
+    
+    @staticmethod
+    def get_potential_customer_by_phone(db: Session, potential_customer_phone: str) -> PotentialCustomer:
+        """Lấy PotentialCustomer theo ID."""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.phone == potential_customer_phone).first()
+    
+    @staticmethod
+    def get_potential_customer_by_code(db: Session, potential_customer_code: str) -> PotentialCustomer:
+        """Lấy PotentialCustomer theo ID."""
+        return db.query(PotentialCustomer).filter(PotentialCustomer.assumed_code == potential_customer_code).first()
+
+    @staticmethod
+    def get_all_potential_customers(db: Session) -> List[PotentialCustomer]:
+        """Lấy danh sách tất cả PotentialCustomer."""
+        return db.query(PotentialCustomer).all()
+
+    @staticmethod
+    def update_potential_customer(db: Session, potential_customer_id: int, update_data: dict) -> PotentialCustomer:
+        """Cập nhật PotentialCustomer theo ID."""
+        potential_customer = db.query(PotentialCustomer).filter(PotentialCustomer.id == potential_customer_id).first()
+        if not potential_customer:
+            return None
+        for key, value in update_data.items():
+            setattr(potential_customer, key, value)
+        db.flush()
+        db.refresh(potential_customer)
+        return potential_customer
+
+    @staticmethod
+    def delete_potential_customer(db: Session, potential_customer_id: int) -> bool:
+        """Xóa PotentialCustomer theo ID."""
+        potential_customer = db.query(PotentialCustomer).filter(PotentialCustomer.id == potential_customer_id).first()
+        if not potential_customer:
+            return False
+        db.delete(potential_customer)
         db.flush()
         return True

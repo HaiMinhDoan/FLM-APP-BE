@@ -152,7 +152,7 @@ class PreQuoteMerchandiseCreateDTO(BaseModel):
     merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
     quantity: int = Field(..., description="Số lượng")
     price: float = Field(..., description="Giá trên đơn vị")
-    gm: float = Field(..., description="Giá mua")
+    gm: float = Field(..., description="GM")
     warranty_years: Optional[int] = Field(..., description="Thời gian bảo hành")
     
 class ComboMerchandiseCreateDTO(BaseModel):
@@ -160,10 +160,25 @@ class ComboMerchandiseCreateDTO(BaseModel):
     merchandise_id: int = Field(..., description="ID của Merchandise liên kết")
     quantity: int = Field(..., description="Số lượng")
     price: float = Field(..., description="Giá trên đơn vị")
-    gm: float = Field(..., description="Giá mua")
+    gm: float = Field(..., description="GM")
 
 class ComboCreateDTO(BaseModel):
     """DTO cho việc tạo mới Combo."""
+    description: Optional[str] = Field(...,description="Mô tả")
+    code: str = Field(..., description="Mã")
+    name: str = Field(..., description="Tên")
+    status: str = Field(..., description="Trạng thái")
+    installation_type : str = Field(..., description="Loại lắp đặt")
+    total_price: Optional[float] = Field(..., description="Tổng giá")
+    kind : str = Field(..., description="Loại")
+    
+    image: Optional[str] = Field(..., description="Ảnh")
+    
+    list_pre_quote_merchandise: List[ComboMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
+    
+class PreQuoteCreateDTO(BaseModel):
+    """DTO cho việc tạo mới báo giá khảo sát và báo giá chi tiết."""
+    potential_customer_id: Optional[int] = Field(...,description="ID của khách hàng tiềm năng")
     description: Optional[str] = Field(...,description="Mô tả")
     code: str = Field(..., description="Mã")
     name: str = Field(..., description="Tên")
@@ -242,3 +257,17 @@ class ContentCreateDTO(BaseModel):
     
     media_contents: List[MediaContentCreateDTO] = Field(..., description="Danh sách MediaContent")
 
+class PotentialCustomerCreateDTO(BaseModel):
+    """DTO cho việc tạo khách hàng tiềm năng mới"""
+    agent_id: Optional[int] = Field(...,description="ID của môi giới")
+    assumed_code: Optional[str] = Field(...,description="Mã giả định của khách hàng")
+    name: Optional[str] = Field(...,description="Tên của khách hàng")
+    phone: Optional[str] = Field(...,description="Số điện thoại khách hàng")
+    gender: Optional[bool] = Field(...,description="Giới tính khách hàng")
+    email: Optional[str] = Field(...,description="Email của khách hàng")
+    address: Optional[str] = Field(...,description="Địa chỉ chi tiết khách hàng")
+    province: Optional[str] = Field(...,description="Tỉnh của khách hàng")
+    district: Optional[str] = Field(...,description="Huyện của khách hàng")
+    ward: Optional[str] = Field(...,description="Phường của khách hàng")
+    interested_in_combo_id: Optional[int] = Field(...,description="ID của combo quan tâm")
+    description: Optional[int] = Field(...,description="Nội dung chi tiết")

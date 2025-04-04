@@ -236,6 +236,7 @@ class PreQuote(Base):
     sector = Column(String(50),nullable=True)
     best_selling = Column(Boolean, nullable=True)
     buyer_id = Column(Integer, nullable= True)
+    potential_customer_id = Column(Integer, nullable=True)
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")
@@ -302,6 +303,27 @@ class Commission(Base):
     
     sector = relationship("Sector")
     user = relationship("User", back_populates="commissions")
+
+class PotentialCustomer(Base):
+    __tablename__ = "potential_customers"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    name = Column(String(100), nullable=True, default="")
+    phone = Column(String(50), nullable=True, default="")
+    gender = Column(Boolean, nullable=True, default=True)
+    email = Column(Boolean, nullable=True, default="")
+    address = Column(String(300), nullable=True, default="")
+    province = Column(String(100), nullable=True, default="")
+    district = Column(String(100), nullable=True, default="")
+    ward = Column(String(100), nullable=True, default="")
+    interested_in_combo_id = Column(Integer, ForeignKey('pre_quotes.id'), nullable=True)
+    description = Column(String(1000), nullable=True, default='')
+    assumed_code = Column(String(100), nullable=True, default='')
+    created_at = Column(DateTime, default=datetime.now)
+    
+    agent = relationship("User")
+    interested_in_combo = relationship("PreQuote")
+    
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu

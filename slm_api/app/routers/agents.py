@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.model.model import get_db, User, Base, Role, LoginHistory, Notification, Commission
-from app.repository.model_repo import UserRepository
-from app.model.dto import UserCreateDTO, UserUpdateDTO
+from sqlalchemy.orm import Session, joinedload
+from app.model.model import get_db, User, Base, Role, LoginHistory, Notification, Commission, PotentialCustomer
+from app.repository.model_repo import UserRepository, PotentialCustomerRepository
+from app.model.dto import UserCreateDTO, UserUpdateDTO, PotentialCustomerCreateDTO
 from typing import List
 from sqlalchemy import func
 from datetime import datetime
+import traceback
 
 router = APIRouter()
 
@@ -116,3 +117,58 @@ def update_territories(id: int, territories_data: dict, db: Session = Depends(ge
     """Cập nhật khu vực phụ trách."""
     # Giả sử có logic cập nhật khu vực
     return {"message": f"Territories updated for agent {id}"}
+
+
+@router.get("/agents/check-remaining-adding-customer/{agent_id}", response_model=dict)
+def check_remaining_adding_customer(agent_id:int,db: Session = Depends(get_db)):
+    """Kiểm tra có còn lượt thêm khách hàng tiềm năng hay không"""
+    potential_customers = PotentialCustomerRepository.get_all_potential_customers_by_agent_id(db=db, agent_id=agent_id)
+    result = 20 - len(potential_customers)
+    if result < 0:
+        result = 0
+    return {"remaining":result}
+
+@router.post("/agents/create-new-potential-customer", response_model=dict)
+def create_new_potential_customer(potential_customer_data: PotentialCustomerCreateDTO, db: Session = Depends(get_db)):
+    """Tạo khách hàng tiềm năng mới."""
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Kiểm tra khách hàng tiềm năng đã tồn tại hay chưa
+            check_exist_customer = PotentialCustomerRepository.get_potential_customer_by_phone(
+                db=db, potential_customer_phone=potential_customer_data.phone
+            )
+            if check_exist_customer:
+                raise HTTPException(status_code=400, detail="Potential customer already exists")
+
+            # Tạo khách hàng tiềm năng mới
+            new_potential_customer = PotentialCustomerRepository.create_potential_customer(
+                db=db,
+                potential_customer_data={
+                    "agent_id": potential_customer_data.agent_id,
+                    "name": potential_customer_data.name,
+                    "phone": potential_customer_data.phone,
+                    "gender": potential_customer_data.gender,
+                    "email": potential_customer_data.email,
+                    "address": potential_customer_data.address,
+                    "province": potential_customer_data.province,
+                    "district": potential_customer_data.district,
+                    "ward": potential_customer_data.ward,
+                    "interested_in_combo_id": potential_customer_data.interested_in_combo_id,
+                    "description": potential_customer_data.description,
+                },
+            )
+
+            if not new_potential_customer:
+                raise HTTPException(status_code=500, detail="Failed to create new potential customer")
+
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "success"}
+    except HTTPException as http_exc:
+        # Trả về lỗi HTTPException nếu có
+        raise http_exc
+    except Exception as e:
+        # Xử lý lỗi không mong muốn
+        print("Error occurred while creating potential customer:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
