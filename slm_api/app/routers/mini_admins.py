@@ -52,7 +52,27 @@ def  check_exist_potential_customer_by_code(code: str, db: Session = Depends(get
     """Kiểm tra xem khách hàng tiềm năng đã tồn tại hay chưa bằng mã giả định."""
     potential_customer_exist = PotentialCustomerRepository.get_one_potential_customers_by_assumed_code(db= db, code=code)
     if potential_customer_exist:
+        old_pre_quotes = PreQuoteRepository.get_pre_quote_by_potential_customer_id(
+            db=db, potential_customer_id=potential_customer_exist.id)
+        old_pre_quotes_dict = []
+        for pre_quote in old_pre_quotes:
+            pre_quote_dict = pre_quote.__dict__.copy()
+            pre_quote_merchandises_dict = []
+            for pre_quote_merchandise in pre_quote.pre_quote_merchandises:
+                pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+                merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+                template_dict = pre_quote_merchandise.merchandise.template.__dict__.copy()
+                template_dict.pop('_sa_instance_state', None)
+                merchandise_dict['template'] = template_dict
+                merchandise_dict.pop('_sa_instance_state', None)
+                pre_quote_merchandise_dict['merchandise'] = merchandise_dict
+                pre_quote_merchandise_dict.pop('_sa_instance_state', None)
+                pre_quote_merchandises_dict.append(pre_quote_merchandise_dict)
+            pre_quote_dict['pre_quote_merchandises'] = pre_quote_merchandises_dict
+            pre_quote_dict.pop('_sa_instance_state', None)
+            old_pre_quotes_dict.append(pre_quote_dict)
         potential_customer_exist_dict = potential_customer_exist.__dict__.copy()
+        potential_customer_exist_dict['old_pre_quotes'] = old_pre_quotes_dict
         potential_customer_exist_dict.pop('_sa_instance_state', None)
         return {"exist": True, "potential_customer": potential_customer_exist_dict}
     else:
