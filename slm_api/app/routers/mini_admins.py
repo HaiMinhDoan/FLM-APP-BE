@@ -9,6 +9,7 @@ from typing import List
 from sqlalchemy import func
 from datetime import datetime
 import traceback
+import json
 
 router = APIRouter()
 
@@ -19,6 +20,49 @@ def check_exist_potential_customer_by_phone(phone: str, db: Session = Depends(ge
     potential_customer_exist = PotentialCustomerRepository.get_potential_customer_by_phone(
         db= db, 
         potential_customer_phone=phone)
+    user = UserRepository.get_user_by_phone(
+        db=db, phone=phone)
+    if user:
+        user_dict = user.__dict__.copy()
+        user_dict["role"] = user.role.__dict__.copy()
+        user_dict["role"].pop("_sa_instance_state", None)
+        
+        combos = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db,buyer_id=user.id,sector="SLM")
+        combos_dict = []
+        for combo in combos:
+            #sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+            combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+            combo_dict = combo.__dict__.copy()
+            combo_dict["pre_quote_merchandises"] = []
+            for pre_quote_merchandise in combo.pre_quote_merchandises:
+                pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+                merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+                merchandise_dict.pop("_sa_instance_state", None)
+                merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+                images = pre_quote_merchandise.merchandise.images
+                images_dict = []
+                for image in images:
+                    image_dict = image.__dict__.copy()
+                    image_dict.pop("_sa_instance_state", None)
+                    images_dict.append(image_dict)
+                merchandise_dict["images"] = images_dict.copy()
+                pre_quote_merchandise_dict["merchandise"] = merchandise_dict
+                pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
+                pre_quote_merchandise_dict.pop("_sa_instance_state", None)
+                # pre_quote_merchandise_dict["gm_price"] = pre_quote_merchandise_dict["gm_price"] if pre_quote_merchandise_dict["gm_price"] else 0
+                combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
+            if(combo.customer):
+                combo_dict["customer"] = combo.customer.__dict__.copy()
+                combo_dict["customer"].pop("_sa_instance_state", None)
+            
+            combo_dict.pop("_sa_instance_state", None)
+            combos_dict.append(combo_dict)
+        
+        user_dict["combos"] = combos_dict.copy()
+        user_dict["combos"].sort(key=lambda x: x["created_at"], reverse=True)
+        user_dict.pop("_sa_instance_state", None)
+        
+        return {"exist": True, "user": user_dict}
     if potential_customer_exist:
         old_pre_quotes = PreQuoteRepository.get_pre_quote_by_potential_customer_id(
             db=db, potential_customer_id=potential_customer_exist.id)
