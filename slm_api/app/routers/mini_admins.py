@@ -20,7 +20,9 @@ def check_exist_potential_customer_by_phone(phone: str, db: Session = Depends(ge
         db= db, 
         potential_customer_phone=phone)
     if potential_customer_exist:
-        return {"exist": True, "potential_customer": potential_customer_exist}
+        potential_customer_exist_dict = potential_customer_exist.__dict__.copy()
+        potential_customer_exist_dict.pop('_sa_instance_state', None)
+        return {"exist": True, "potential_customer": potential_customer_exist_dict}
     else:
         return {"exist": False}
     
@@ -30,7 +32,9 @@ def  check_exist_potential_customer_by_code(code: str, db: Session = Depends(get
     """Kiểm tra xem khách hàng tiềm năng đã tồn tại hay chưa bằng mã giả định."""
     potential_customer_exist = PotentialCustomerRepository.get_one_potential_customers_by_assumed_code(db= db, code=code)
     if potential_customer_exist:
-        return {"exist": True, "potential_customer": potential_customer_exist}
+        potential_customer_exist_dict = potential_customer_exist.__dict__.copy()
+        potential_customer_exist_dict.pop('_sa_instance_state', None)
+        return {"exist": True, "potential_customer": potential_customer_exist_dict}
     else:
         return {"exist": False}
     
