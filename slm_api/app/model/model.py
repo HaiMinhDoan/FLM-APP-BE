@@ -10,8 +10,8 @@ POSTGRES_DB = "slm_app"
 POSTGRES_HOST = "localhost"  # Hoặc địa chỉ server PostgreSQL
 POSTGRES_PORT = "5432"  # Cổng mặc định của PostgreSQL
 
-# DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-DATABASE_URL = "postgresql://postgres:0146424Minh@i0s0ckccckk4o4k804cc8og8:5432/slm_app"
+DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+# DATABASE_URL = "postgresql://postgres:0146424Minh@i0s0ckccckk4o4k804cc8og8:5432/slm_app"
 
 # Tạo engine kết nối
 engine = create_engine(DATABASE_URL, echo=True)
@@ -324,7 +324,29 @@ class PotentialCustomer(Base):
     
     agent = relationship("User")
     interested_in_combo = relationship("PreQuote")
+
+class BannerImage(Base):
+    __tablename__ = 'banner_images'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    banner_id = Column(Integer, ForeignKey('banners.id'), nullable=False)
+    link = Column(String(1000), nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
     
+    banner = relationship("Banner", back_populates="banner_images")
+
+class Banner(Base):
+    __tablename__ = 'banners'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    image = Column(String(1000), nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    slug = Column(String(800), nullable=True)
+    sector_id = Column(Integer, ForeignKey('sectors.id'), nullable=True)
+    location = Column(String(50), nullable=True, default="home")
+    
+    banner_images = relationship("BannerImage", back_populates="banner", cascade="all, delete-orphan")
+    
+    sector = relationship("Sector")
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu
