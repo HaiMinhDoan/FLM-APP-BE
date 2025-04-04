@@ -142,3 +142,49 @@ def get_merchandise(id: int, db: Session = Depends(get_db)):
     merchandise_dict.pop("_sa_instance_state", None)
     merchandise_dict["data_json"] = merchandise.get_data()
     return merchandise_dict
+
+
+@router.get("/products", response_model=List[dict])
+def get_merchandises_with_images(db: Session = Depends(get_db)):
+    """Lấy danh sách sản phẩm."""
+    list_merchandises = MerchandiseRepository.get_all_merchandises_with_prices_and_images(db)
+    list_merchandises.sort(key=lambda merchandise: merchandise.id)
+    list_merchandises_dict = []
+    for merchandise in list_merchandises:
+        merchandise_dict = merchandise.__dict__.copy()
+        
+        
+        # Process price information
+        price_infos_dict = []
+        for price_info in merchandise.price_infos:
+            price_info_dict = price_info.__dict__.copy()
+            price_info_dict.pop("_sa_instance_state", None)
+            price_infos_dict.append(price_info_dict)
+        merchandise_dict["price_infos"] = price_infos_dict
+        
+        # Process template information
+        template_dict = merchandise.template.__dict__.copy()
+        template_dict.pop("_sa_instance_state", None)
+        template_dict["structure_json"] = json.loads(template_dict["structure_json"])
+        merchandise_dict["template"] = template_dict
+        # Process brand information
+        brand_dict = merchandise.brand.__dict__.copy()
+        brand_dict.pop("_sa_instance_state", None)
+        merchandise_dict["brand"] = brand_dict
+        # Process supplier information
+        supplier_dict = merchandise.brand.__dict__.copy()
+        supplier_dict.pop("_sa_instance_state", None)
+        merchandise_dict["supplier"] = supplier_dict
+        #process images
+        images_dict = []
+        for image in merchandise.images:
+            image_dict = image.__dict__.copy()
+            image_dict.pop("_sa_instance_state", None)
+            images_dict.append(image_dict)
+        merchandise_dict["images"] = images_dict
+        # Process data_json
+        merchandise_dict["data_json"] = merchandise.get_data()
+        merchandise_dict.pop("_sa_instance_state", None)
+        
+        list_merchandises_dict.append(merchandise_dict)
+    return list_merchandises_dict

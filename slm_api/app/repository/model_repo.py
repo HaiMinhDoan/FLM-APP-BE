@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import Commission,MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
 from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory, PotentialCustomer
-from app.model.model import Image
+from app.model.model import Image, Banner
 from typing import List
 from sqlalchemy import or_
 
@@ -384,6 +384,15 @@ class MerchandiseRepository:
     def get_all_merchandises_with_prices(db: Session):
         """Lấy danh sách tất cả Merchandise cùng với PriceInfo."""
         return db.query(Merchandise).options(joinedload(Merchandise.price_infos), joinedload(Merchandise.template), joinedload(Merchandise.brand), joinedload(Merchandise.supplier)).all()
+    
+    @staticmethod
+    def get_all_merchandises_with_prices_and_images(db: Session):
+        """Lấy danh sách tất cả Merchandise cùng với PriceInfo."""
+        return db.query(Merchandise).options(
+            joinedload(Merchandise.price_infos),
+            joinedload(Merchandise.images), 
+            joinedload(Merchandise.template), 
+            joinedload(Merchandise.brand), joinedload(Merchandise.supplier)).all()
 
     @staticmethod
     def update_merchandise(db: Session, merchandise_id: int, update_data: dict) -> Merchandise:
@@ -1027,3 +1036,37 @@ class PotentialCustomerRepository:
         db.delete(potential_customer)
         db.flush()
         return True
+    
+class BannerRepository:
+    """Repository cho model Banner."""
+
+    @staticmethod
+    def create_banner(db: Session, banner_data: dict) -> Banner:
+        """Tạo một Banner mới."""
+        banner = Banner(**banner_data)
+        db.add(banner)
+        db.flush()
+        db.refresh(banner)
+        return banner
+
+    @staticmethod
+    def get_banner_by_id(db: Session, banner_id: int) -> Banner:
+        """Lấy Banner theo ID."""
+        return db.query(Banner).filter(Banner.id == banner_id).first()
+
+    @staticmethod
+    def get_all_banners(db: Session) -> List[Banner]:
+        """Lấy danh sách tất cả Banner."""
+        return db.query(Banner).all()
+
+    @staticmethod
+    def update_banner(db: Session, banner_id: int, update_data: dict) -> Banner:
+        """Cập nhật Banner theo ID."""
+        banner = db.query(Banner).filter(Banner.id == banner_id).first()
+        if not banner:
+            return None
+        for key, value in update_data.items():
+            setattr(banner, key, value)
+        db.flush()
+        db.refresh(banner)
+        return banner
