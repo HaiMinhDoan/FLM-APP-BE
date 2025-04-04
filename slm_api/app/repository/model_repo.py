@@ -950,9 +950,9 @@ class CommissionRepository:
 class PotentialCustomerRepository:
     """PotentialCustomerRepository thao tác dữ liệu với bảng PotentialCustomer"""
     @staticmethod
-    def get_one_potential_customers_by_assumed_code(db: Session, code:str) -> List[PotentialCustomer]:
+    def get_one_potential_customers_by_assumed_code(db: Session, code:str) -> PotentialCustomer:
         """Lấy tất cả những khách hàng tiềm năng của agent có id là agent_id"""
-        return db.query(PotentialCustomer).filter(PotentialCustomer.assumed_code == code).all()
+        return db.query(PotentialCustomer).filter(PotentialCustomer.assumed_code == code).first()
     @staticmethod
     def get_all_potential_customers_by_agent_id(db: Session, agent_id:int) -> List[PotentialCustomer]:
         """Lấy tất cả những khách hàng tiềm năng của agent có id là agent_id"""
@@ -979,12 +979,12 @@ class PotentialCustomerRepository:
     
     @staticmethod
     def get_potential_customer_by_phone(db: Session, potential_customer_phone: str) -> PotentialCustomer:
-        """Lấy PotentialCustomer theo ID."""
+        """Lấy PotentialCustomer theo số điện thoại."""
         return db.query(PotentialCustomer).filter(PotentialCustomer.phone == potential_customer_phone).first()
     
     @staticmethod
     def get_potential_customer_by_code(db: Session, potential_customer_code: str) -> PotentialCustomer:
-        """Lấy PotentialCustomer theo ID."""
+        """Lấy PotentialCustomer theo mã."""
         return db.query(PotentialCustomer).filter(PotentialCustomer.assumed_code == potential_customer_code).first()
 
     @staticmethod
