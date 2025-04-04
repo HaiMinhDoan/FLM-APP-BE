@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.model.model import get_db
 from app.repository.model_repo import Role, TokenRepository,PreQuoteRepository
-from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, CommissionRepository, ContentRepository
+from app.repository.model_repo import UserRepository, LoginHistoryRepository, NotificationRepository, CommissionRepository, ContentRepository,SectorRepository
 from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
@@ -109,12 +109,16 @@ def get_user(id: int, db: Session = Depends(get_db)):
             media_content_dict.pop("_sa_instance_state", None)
             media_contents_dict.append(media_content_dict)
         content_dict["media_contents"] = media_contents_dict
-        category = content.category.__dict__.copy()
-        sector = content.category.sector.__dict__.copy()
-        category["sector"] = sector
-        category["sector"].pop("_sa_instance_state", None)
-        category.pop("_sa_instance_state", None)
-        content_dict["category"] = category
+        category_dict = content.category.__dict__.copy()
+        cate_sector = SectorRepository.get_sector_by_code(db, category_dict["sector"])
+        cate_sector_dict = cate_sector.__dict__.copy()
+        cate_sector_dict.pop("_sa_instance_state", None)
+        category_dict["sector"] = cate_sector_dict
+        category_dict["sector"].pop("_sa_instance_state", None)
+        category_dict.pop("_sa_instance_state", None)
+        content_dict["category"] = category_dict
+        content_dict["media_contents"] = media_contents_dict
+        content_dict["media_contents"].pop("_sa_instance_state", None)
         content_dict["category"].pop("_sa_instance_state", None)
         content_dict.pop("_sa_instance_state", None)
         contents_dict.append(content_dict)

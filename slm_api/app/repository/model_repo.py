@@ -655,6 +655,11 @@ class SectorRepository:
     def get_sector_by_id(db: Session, sector_id: int) -> Sector:
         """Lấy Sector theo ID."""
         return db.query(Sector).filter(Sector.id == sector_id).first()
+    
+    @staticmethod
+    def get_sector_by_id(db: Session, code: str) -> Sector:
+        """Lấy Sector theo ID."""
+        return db.query(Sector).filter(Sector.code == code).first()
 
     @staticmethod
     def get_all_sectors(db: Session):
@@ -770,7 +775,7 @@ class ContentRepository:
         """Lấy danh sách tất cả Content theo hashtag."""
         return (
             db.query(Content)
-            .options(joinedload(Content.media_contents),joinedload(Content.category).joinedload(ContentCategory.sector))
+            .options(joinedload(Content.media_contents),joinedload(Content.category))
             .filter(Content.hashtag.like(f"%{hashtag}%"))
             .all()
         )
