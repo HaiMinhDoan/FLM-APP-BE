@@ -237,6 +237,7 @@ class PreQuote(Base):
     best_selling = Column(Boolean, nullable=True)
     buyer_id = Column(Integer, nullable= True)
     potential_customer_id = Column(Integer, nullable=True)
+    phase_type = Column(String(100), nullable=True, default="")
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")
