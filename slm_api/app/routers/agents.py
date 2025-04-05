@@ -103,7 +103,7 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
         child_dict.pop('_sa_instance_state', None)
         children_dict.append(child_dict)
     # Giả sử có quan hệ parent_id để xác định cấp dưới
-    return child_dict
+    return children_dict
 
 @router.get("/agents/{id}/old-customer", response_model=List[dict])
 def get_old_customers(id: int, db: Session = Depends(get_db)):
