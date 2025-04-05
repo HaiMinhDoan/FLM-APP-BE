@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import get_db, User, Base, Role, LoginHistory, Notification, Commission, PotentialCustomer
-from app.repository.model_repo import UserRepository, PotentialCustomerRepository
+from app.repository.model_repo import UserRepository, PotentialCustomerRepository, PreQuoteRepository, CustomerRepository
 from app.model.dto import UserCreateDTO, UserUpdateDTO, PotentialCustomerCreateDTO
 from typing import List
 from sqlalchemy import func
@@ -57,7 +57,7 @@ def delete_agent(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Agent deleted successfully"}
 
-@router.get("/agents/{id}/downlines", response_model=List[dict])
+@router.get("/agents/{id}/downlines", response_model=dict)
 def get_downlines(id: int, db: Session = Depends(get_db)):
     """Lấy danh sách đại lý cấp dưới."""
     children = UserRepository.get_agent_by_parent_id(db=db, parent_id=id)
@@ -79,7 +79,14 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
     )
     #chuyển toàn bộ children thành danh sách dict
     children_dict = []
+    total_turnover = 0
     for child in children:
+        customers = CustomerRepository.get_customer_by_sale_id(db=db, sale_id=child.id)
+        for customer in customers:
+            cus_contracts = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db, sector="SLM", buyer_id=customer.id)
+            for cus_contract in cus_contracts:
+                total_turnover += cus_contract.total_price
+                
         child_dict = child.__dict__.copy()
         commissions = child.commissions
         commissions_dict = []
@@ -92,7 +99,7 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
         child_dict.pop('_sa_instance_state', None)
         children_dict.append(child_dict)
     # Giả sử có quan hệ parent_id để xác định cấp dưới
-    return children_dict
+    return {"children": children_dict, "total_turnover": total_turnover}
 
 @router.get("/agents/{id}/old-customer", response_model=List[dict])
 def get_old_customers(id: int, db: Session = Depends(get_db)):

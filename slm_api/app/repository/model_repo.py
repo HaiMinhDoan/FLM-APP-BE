@@ -492,6 +492,7 @@ class PreQuoteRepository:
             .joinedload(PreQuoteMerchandise.merchandise)
             .joinedload(Merchandise.template)).filter(PreQuote.potential_customer_id == potential_customer_id).all()
     
+    
     @staticmethod
     def get_pre_quote_by_id_simple(db: Session, pre_quote_id: int) -> PreQuote:
         """Lấy PreQuote theo ID."""
@@ -728,6 +729,11 @@ class CustomerRepository:
     def get_customer_by_id(db: Session, customer_id: int) -> Customer:
         """Lấy Customer theo ID."""
         return db.query(Customer).filter(Customer.id == customer_id).first()
+    
+    @staticmethod
+    def get_customer_by_sale_id(db: Session, sale_id: int) -> Customer:
+        """Lấy Customer theo sale ID."""
+        return db.query(Customer).filter(Customer.user_id == sale_id).all()
     
     @staticmethod
     def get_customer_by_code(db: Session, code: str) -> Customer:
