@@ -81,11 +81,15 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
     children_dict = []
     total_turnover = 0
     for child in children:
+        child_turnover = 0
         customers = CustomerRepository.get_customer_by_sale_id(db=db, sale_id=child.id)
         for customer in customers:
             cus_contracts = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db, sector="SLM", buyer_id=customer.id)
             for cus_contract in cus_contracts:
                 total_turnover += cus_contract.total_price
+                child_turnover += cus_contract.total_price
+            # lưu lại tổng doanh thu của từng đại lý
+            child.total_turnover = child_turnover
                 
         child_dict = child.__dict__.copy()
         commissions = child.commissions
@@ -99,7 +103,7 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
         child_dict.pop('_sa_instance_state', None)
         children_dict.append(child_dict)
     # Giả sử có quan hệ parent_id để xác định cấp dưới
-    return {"children": children_dict, "total_turnover": total_turnover}
+    return child_dict
 
 @router.get("/agents/{id}/old-customer", response_model=List[dict])
 def get_old_customers(id: int, db: Session = Depends(get_db)):
