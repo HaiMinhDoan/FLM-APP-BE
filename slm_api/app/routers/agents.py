@@ -57,7 +57,7 @@ def delete_agent(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Agent deleted successfully"}
 
-@router.get("/agents/{id}/downlines", response_model=dict)
+@router.get("/agents/{id}/downlines", response_model=List[dict])
 def get_downlines(id: int, db: Session = Depends(get_db)):
     """Lấy danh sách đại lý cấp dưới."""
     children = UserRepository.get_agent_by_parent_id(db=db, parent_id=id)
