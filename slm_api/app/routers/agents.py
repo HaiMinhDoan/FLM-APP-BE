@@ -88,8 +88,6 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
             for cus_contract in cus_contracts:
                 total_turnover += cus_contract.total_price
                 child_turnover += cus_contract.total_price
-            # lưu lại tổng doanh thu của từng đại lý
-            child.total_turnover = child_turnover
                 
         child_dict = child.__dict__.copy()
         commissions = child.commissions
@@ -100,6 +98,7 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
             commission_dict.pop('_sa_instance_state', None)
             commissions_dict.append(commission_dict)
         child_dict['commissions'] = commissions_dict
+        child_dict['child_turnover'] = child_turnover
         child_dict.pop('_sa_instance_state', None)
         children_dict.append(child_dict)
     # Giả sử có quan hệ parent_id để xác định cấp dưới
