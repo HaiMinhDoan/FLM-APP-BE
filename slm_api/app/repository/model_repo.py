@@ -731,7 +731,7 @@ class CustomerRepository:
         return db.query(Customer).filter(Customer.id == customer_id).first()
     
     @staticmethod
-    def get_customer_by_sale_id(db: Session, sale_id: int) -> Customer:
+    def get_customer_by_sale_id(db: Session, sale_id: int) -> List[Customer]:
         """Lấy Customer theo sale ID."""
         return db.query(Customer).filter(Customer.user_id == sale_id).all()
     
