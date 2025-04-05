@@ -339,7 +339,6 @@ class Banner(Base):
     __tablename__ = 'banners'
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(255), nullable=False)
-    image = Column(String(1000), nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     slug = Column(String(800), nullable=True)
     sector_id = Column(Integer, ForeignKey('sectors.id'), nullable=True)
