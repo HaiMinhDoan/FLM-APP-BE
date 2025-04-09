@@ -515,7 +515,7 @@ def get_combo_by_id(id:int,db: Session = Depends(get_db)):
     merchandise_templates = MerchandiseTemplateRepository.get_all_merchandise_templates
     combo = PreQuoteRepository.get_pre_quote_by_id(db=db,pre_quote_id=id)
     el_price = 3000
-    electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, id=1)
+    electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, electric_price_id=1)
     if electric_price:
         el_price = electric_price.price
     if not combo:

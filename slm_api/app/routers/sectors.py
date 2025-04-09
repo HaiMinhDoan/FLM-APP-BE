@@ -17,7 +17,7 @@ def get_sectors(db: Session = Depends(get_db)):
         sectors = SectorRepository.get_all_sectors(db)
         sectors_dict = []
         el_price = 3000
-        electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, id=1)
+        electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, electric_price_id=1)
         if electric_price:
             el_price = electric_price.price
         for sector in sectors:
