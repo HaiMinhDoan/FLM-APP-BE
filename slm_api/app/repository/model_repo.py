@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from app.model.model import Commission,MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
-from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory, PotentialCustomer
+from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory, PotentialCustomer, ElectricPrice
 from app.model.model import Image, Banner
 from typing import List
 from sqlalchemy import or_
@@ -1081,3 +1081,47 @@ class BannerRepository:
         db.flush()
         db.refresh(banner)
         return banner
+
+class ElectricPriceRepository:
+    """Repository cho model ElectricPrice."""
+
+    @staticmethod
+    def create_electric_price(db: Session, electric_price_data: dict) -> ElectricPrice:
+        """Tạo một ElectricPrice mới."""
+        electric_price = ElectricPrice(**electric_price_data)
+        db.add(electric_price)
+        db.flush()
+        db.refresh(electric_price)
+        return electric_price
+
+    @staticmethod
+    def get_electric_price_by_id(db: Session, electric_price_id: int) -> ElectricPrice:
+        """Lấy ElectricPrice theo ID."""
+        return db.query(ElectricPrice).filter(ElectricPrice.id == electric_price_id).first()
+
+    @staticmethod
+    def get_all_electric_prices(db: Session) -> List[ElectricPrice]:
+        """Lấy danh sách tất cả ElectricPrice."""
+        return db.query(ElectricPrice).all()
+
+    @staticmethod
+    def update_electric_price(db: Session, electric_price_id: int, update_data: dict) -> ElectricPrice:
+        """Cập nhật ElectricPrice theo ID."""
+        electric_price = db.query(ElectricPrice).filter(ElectricPrice.id == electric_price_id).first()
+        if not electric_price:
+            return None
+        for key, value in update_data.items():
+            setattr(electric_price, key, value)
+        db.flush()
+        db.refresh(electric_price)
+        return electric_price
+
+    @staticmethod
+    def delete_electric_price(db: Session, electric_price_id: int) -> bool:
+        """Xóa ElectricPrice theo ID."""
+        electric_price = db.query(ElectricPrice).filter(ElectricPrice.id == electric_price_id).first()
+        if not electric_price:
+            return False
+        db.delete(electric_price)
+        db.flush()
+        return True

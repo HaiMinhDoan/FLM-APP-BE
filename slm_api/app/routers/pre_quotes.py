@@ -53,7 +53,10 @@ def create_combo(pre_quote_data: ComboCreateDTO, db: Session = Depends(get_db)):
                 "total_price": pre_quote_data.total_price,
                 "kind": "combo",
                 "description": pre_quote_data.description,
-                "image": pre_quote_data.image
+                "image": pre_quote_data.image,
+                "phase_type": pre_quote_data.phase_type,
+                "output_max": pre_quote_data.output_max,
+                "output_min": pre_quote_data.output_min
             })
 
             if not newCombo:

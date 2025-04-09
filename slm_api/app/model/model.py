@@ -238,6 +238,8 @@ class PreQuote(Base):
     buyer_id = Column(Integer, nullable= True)
     potential_customer_id = Column(Integer, nullable=True)
     phase_type = Column(String(100), nullable=True, default="")
+    output_max = Column(Integer, nullable=True, default=0)
+    output_min = Column(Integer, nullable=True, default=0)
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")
@@ -347,6 +349,12 @@ class Banner(Base):
     banner_images = relationship("BannerImage", back_populates="banner", cascade="all, delete-orphan")
     
     sector = relationship("Sector")
+
+class ElectricPrice(Base):
+    __tablename__ = 'electric_prices'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    price = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
 
 if __name__ == "__main__":
     # Tạo tất cả các bảng trong cơ sở dữ liệu

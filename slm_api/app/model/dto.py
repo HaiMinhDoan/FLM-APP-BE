@@ -173,6 +173,9 @@ class ComboCreateDTO(BaseModel):
     kind : str = Field(..., description="Loại")
     
     image: Optional[str] = Field(..., description="Ảnh")
+    phase_type : Optional[str] = Field(..., description="Loại giai đoạn")
+    output_max: Optional[int] = Field(..., description="Công suất tối đa")
+    output_min: Optional[int] = Field(..., description="Công suất tối thiểu")
     
     list_pre_quote_merchandise: List[ComboMerchandiseCreateDTO] = Field(..., description="Danh sách PreQuoteMerchandise")
     
