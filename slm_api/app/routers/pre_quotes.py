@@ -522,7 +522,7 @@ def get_combo_by_id(id:int,db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Combo not found")
 
     combo_dict = combo.__dict__.copy()
-    combo_dict["payback_period"] = combo_dict["total_price"]/((combo_dict["output_max"]+combo_dict["output_min"])/2*el_price*12)
+    combo_dict["payback_period"] = combo.total_price/((combo.output_max+combo.output_min)/2*el_price*12)
     combo_dict["pre_quote_merchandises"] = []
 
     for pre_quote_merchandise in combo.pre_quote_merchandises:

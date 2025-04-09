@@ -33,7 +33,7 @@ def get_sectors(db: Session = Depends(get_db)):
                 # Sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
                 combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
                 combo_dict = combo.__dict__.copy()
-                combo_dict["payback_period"] = combo_dict["total_price"]/((combo_dict["output_max"]+combo_dict["output_min"])/2*el_price*12)
+                combo_dict["payback_period"] = combo.total_price/((combo.output_max+combo.output_min)/2*el_price*12)
                 # Xử lý danh sách pre_quote_merchandises
                 combo_dict["pre_quote_merchandises"] = []
                 for pre_quote_merchandise in combo.pre_quote_merchandises:
