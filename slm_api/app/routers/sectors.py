@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.model.model import get_db, Sector
-from app.repository.model_repo import SectorRepository, ContentCategoryRepository, ContentRepository, PreQuoteRepository
+from app.repository.model_repo import SectorRepository, ContentCategoryRepository, ContentRepository, PreQuoteRepository, ElectricPriceRepository
 from app.repository.model_repo import ContentRepository
 from app.model.dto import SectorCreateDTO
 from typing import List
