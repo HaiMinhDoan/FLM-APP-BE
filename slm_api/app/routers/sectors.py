@@ -16,7 +16,10 @@ def get_sectors(db: Session = Depends(get_db)):
         # Lấy tất cả các Sector từ repository
         sectors = SectorRepository.get_all_sectors(db)
         sectors_dict = []
-
+        el_price = 3000
+        electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, id=1)
+        if electric_price:
+            el_price = electric_price.price
         for sector in sectors:
             # Lấy danh sách combo theo sector code
             combos = PreQuoteRepository.get_pre_quotes_by_kind_and_sector(db=db, kind="combo", sector=sector.code)
@@ -30,7 +33,7 @@ def get_sectors(db: Session = Depends(get_db)):
                 # Sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
                 combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
                 combo_dict = combo.__dict__.copy()
-
+                combo_dict["payback_period"] = combo_dict["total_price"]/((combo_dict["output_max"]+combo_dict["output_min"])/2*el_price*12)
                 # Xử lý danh sách pre_quote_merchandises
                 combo_dict["pre_quote_merchandises"] = []
                 for pre_quote_merchandise in combo.pre_quote_merchandises:
