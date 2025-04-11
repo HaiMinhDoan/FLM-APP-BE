@@ -155,9 +155,9 @@
                     <td>{{ pre_quote_merchandise["merchandise"]["brand"]["name"] }}</td>
                     <td>{{ pre_quote_merchandise["merchandise"]["unit"] }}</td>
                     <td>{{ pre_quote_merchandise["quantity"] }}</td>
-                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 }}</td>
-                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"] }}</td>
-                    <td>{{ pre_quote_merchandise["warranty_years"] }}.</td>
+                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 | int}}</td>
+                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"] | int}}</td>
+                    <td>{{ pre_quote_merchandise["warranty_years"] }} năm</td>
                 </tr>
             {% endfor %}
         {% endfor %}
