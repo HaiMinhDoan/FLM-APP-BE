@@ -127,8 +127,8 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
         'encoding': "UTF-8",
         'no-outline': None,
         'disable-smart-shrinking': '',
-        'header-html': '/slm_api/app/templates/header_rendered.html',
-        'footer-html': '/slm_api/app/templates/footer_rendered.html',
+        'header-html': 'app/templates/header_rendered.html',
+        'footer-html': 'app/templates/footer_rendered.html',
         'header-spacing': '5',   # spacing giữa header và nội dung (px)
         'footer-spacing': '5',
         'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
