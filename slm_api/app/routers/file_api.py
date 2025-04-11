@@ -14,7 +14,17 @@ templates = Jinja2Templates(directory="app/templates")
 config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 options = {
     'no-stop-slow-scripts': None,
-    'debug-javascript': None
+    'debug-javascript': None,
+    'enable-local-file-access': '',
+    'page-size': 'A4',
+    'margin-top': '10mm',
+    'margin-right': '10mm',
+    'margin-bottom': '10mm',
+    'margin-left': '10mm',
+    'encoding': "UTF-8",
+    'no-outline': None,
+    'disable-smart-shrinking': '',
+    'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
 }
 router = APIRouter()
 

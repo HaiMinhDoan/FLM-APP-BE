@@ -40,6 +40,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            page-break-inside: auto;
         }
         
         th, td {
@@ -52,6 +53,10 @@
         th {
             background-color: #f2f2f2;
             font-weight: bold;
+        }
+        tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid;
         }
         
         .total-row {
