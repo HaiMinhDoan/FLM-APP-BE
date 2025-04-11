@@ -144,7 +144,7 @@
             <th>BẢO HÀNH</th>
         </tr>
         {%for grouped_merchandise in combo["grouped_merchandises"] %}
-            {%for pre_quote_merchandise in grouped_merchandise.["pre_quote_merchandises"] %}
+            {%for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
                 <tr>
                     {% if loop.index == 1 %}
                         <td rowspan='{{ grouped_merchandise["pre_quote_merchandises"].length }}"'>{{ loop.parent.index }}</td>
