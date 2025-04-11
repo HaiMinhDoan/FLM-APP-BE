@@ -40,6 +40,9 @@ def get_sectors(db: Session = Depends(get_db)):
                     pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
                     pre_quote_merchandise_dict["price_on_gm"] = pre_quote_merchandise_dict["price"]/(1-pre_quote_merchandise_dict["gm"]/100)
                     merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+                    brand_dict = pre_quote_merchandise.merchandise.brand.__dict__.copy()
+                    brand_dict.pop("_sa_instance_state", None)
+                    merchandise_dict["brand"] = brand_dict
                     merchandise_dict.pop("_sa_instance_state", None)
                     merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
                     images = pre_quote_merchandise.merchandise.images

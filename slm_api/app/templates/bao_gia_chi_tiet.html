@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo giá hệ thống điện mặt trời</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .heading {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .recipient {
+            font-weight: bold;
+            text-decoration: underline;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        
+        .intro-text {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            font-weight: bold;
+        }
+        
+        .terms {
+            margin-top: 20px;
+        }
+        
+        .terms h3 {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .terms ul {
+            padding-left: 20px;
+        }
+        
+        .terms li {
+            margin-bottom: 5px;
+        }
+        
+        .product-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        
+        .product-item {
+            width: 30%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .product-img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .grid-item {
+            text-align: center;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+        
+        .grid-img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .mark {
+            background-color: transparent;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 class="heading mark">BÁO GIÁ</h2>
+        <p class="recipient mark"><i><u>Kính gửi</u>:</i> QUÝ KHÁCH HÀNG</p>
+    </div>
+
+    <p class="intro-text"><strong>SLM INVESTMENT .,JSC</strong> xin gửi lời cảm ơn tới Quý khách hàng đã quan tâm và lựa chọn dịch vụ cung cấp và lắp đặt hệ thống điện mặt trời áp mái của chúng tôi.</p>
+
+    <p class="intro-text">Công ty chúng tôi trân trọng gửi tới Quý khách hàng báo giá cho GIẢI PHÁP HỆ ĐIỆN MẶT TRỜI ÁP MÁI_ CÔNG SUẤT PV {{ power }} KWP_ {{ combo["installation_type"] }} 1 PHA LƯU TRỮ {{ storage_capacity_kwh }}KWH CAO CẤP. Cụ thể như sau:</p>
+
+    <table>
+        <tr>
+            <th>TT</th>
+            <th>HẠNG MỤC</th>
+            <th>TÊN SẢN PHẨM</th>
+            <th>THƯƠNG HIỆU</th>
+            <th>ĐƠN VỊ</th>
+            <th>SỐ LƯỢNG</th>
+            <th>ĐƠN GIÁ</th>
+            <th>THÀNH TIỀN</th>
+            <th>BẢO HÀNH</th>
+        </tr>
+        {%for grouped_merchandise in combo["grouped_merchandises"] %}
+            {%for pre_quote_merchandise in grouped_merchandise.["pre_quote_merchandises"] %}
+                <tr>
+                    {% if loop.index == 1 %}
+                        <td rowspan='{{ grouped_merchandise["pre_quote_merchandises"].length }}"'>{{ loop.parent.index }}</td>
+                        <td>{{ grouped_merchandise["template"]["name"] }}</td>
+                    {% endif %}
+                    <td>{{ pre_quote_merchandise["merchandise"]["name"] }}</td>
+                    <td>{{ pre_quote_merchandise["merchandise"]["brand"]["name"] }}</td>
+                    <td>{{ pre_quote_merchandise["merchandise"]["unit"] }}</td>
+                    <td>{{ pre_quote_merchandise["quantity"] }}</td>
+                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 }}</td>
+                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"]}}</td>
+                    <td>{{ pre_quote_merchandise["warranty_years"] }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="6">TỔNG CỘNG GIÁ TRỊ TRỌN GÓI VẬT TƯ THIẾT BỊ - VẬN CHUYỂN - LẮP ĐẶT - BẢO HÀNH (Đã bao gồm VAT 10%)</td>
+            <td></td>
+            <td><strong>{{ combo["total_price"] }}</strong></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div class="terms">
+        <h3 class="mark">Điều khoản thương mại:</h3>
+        <ul>
+            <li class="">Bảng kê nguyên vật liệu thiết bị hệ thống điện mặt trời: Chi tiết như bảng đính kèm</li>
+            <li class="mark">Chi phí trên chưa bao gồm cung cấp và lắp dựng khung thép (Nếu có).</li>
+            <li class="">Địa điểm thi công: Theo địa điểm chỉ định của Quý khách hàng</li>
+            <li class="">Tiến độ triển khai: 15 ngày kể từ ngày tạm ứng</li>
+            <li class="">Phương thức thanh toán:
+                <ul>
+                    <li class="">Tạm ứng (Đợt 1): Quý khách hàng thanh toán 30% giá trị đơn hàng ngay khi hợp đồng có hiệu lực</li>
+                    <li class="">Thanh toán vật liệu (Đợt 2): Quý khách hàng thanh toán 60% giá trị đơn hàng ngay khi toàn bộ nguyên vật liệu được tập kết tại địa chỉ thi công</li>
+                    <li class="">Thanh toán hoàn thành (Đợt 3): Quý khách hàng thanh toán 10% giá trị còn lại của đơn hàng ngay khi công trình được nghiệm thu và bàn giao thành công</li>
+                </ul>
+            </li>
+            <li class="">Thông tin tài khoản ngân hàng:
+                <ul>
+                    <li class="">Tên thụ hưởng: Công ty cổ phần đầu tư SLM</li>
+                    <li class="">Ngân hàng thụ hưởng: Ngân hàng TMCP Quân Đội - HSC</li>
+                    <li class="">Số tài khoản: 988866699</li>
+                </ul>
+            </li>
+            <li class="">Thời hạn báo giá: 15 ngày kể từ ngày báo giá</li>
+        </ul>
+    </div>
+
+    <h3 class="">DANH SÁCH VẬT LIỆU CHI TIẾT</h3>
+
+    <div class="product-gallery">
+        <div class="product-item">
+            <img src="/api/placeholder/400/320" alt="Solar Panel" class="product-img">
+            <p>Solar Panel (BH: 12 NĂM)</p>
+        </div>
+        <div class="product-item">
+            <img src="/api/placeholder/400/320" alt="Inverter Solis" class="product-img">
+            <p>Inverter Solis (BH: 05 NĂM)</p>
+        </div>
+        <div class="product-item">
+            <img src="/api/placeholder/400/320" alt="Pin Lithium Dyness" class="product-img">
+            <p>Pin Lithium Dyness (BH: 05 NĂM)</p>
+        </div>
+    </div>
+
+    <div class="product-grid">
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Kẹp biên nhôm" class="grid-img">
+            <p>Kẹp biên nhôm</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Kẹp giữa nhôm" class="grid-img">
+            <p>Kẹp giữa nhôm</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Full rail nhôm 4.2 mét mái tôn" class="grid-img">
+            <p>Full rail nhôm 4.2 mét mái tôn</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Thanh nối nhôm" class="grid-img">
+            <p>Thanh nối nhôm</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Chân nhôm L" class="grid-img">
+            <p>Chân nhôm L</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Cáp điện DC Solar 0.4 1500V" class="grid-img">
+            <p>Cáp điện DC Solar 0.4 1500V</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Dây cáp điện 1 pha 2 lõi" class="grid-img">
+            <p>Dây cáp điện 1 pha 2 lõi</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Jack MC4 - 1500V" class="grid-img">
+            <p>Jack MC4 - 1500V</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Tủ điện + Aptomat" class="grid-img">
+            <p>Tủ điện + Aptomat</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Dây dẫn cáp đồng bọc PVC CV-4 mm2" class="grid-img">
+            <p>Dây dẫn cáp đồng bọc PVC CV-4 mm2</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Cọc đồng tiếp địa 1.5 mét" class="grid-img">
+            <p>Cọc đồng tiếp địa 1.5 mét</p>
+        </div>
+        <div class="grid-item">
+            <img src="/api/placeholder/250/200" alt="Ống nhựa HDPE đường kính 32/25 mm" class="grid-img">
+            <p>Ống nhựa HDPE đường kính 32/25 mm</p>
+        </div>
+    </div>
+</body>
+</html>

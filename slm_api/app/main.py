@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 import json
-from app.routers import users, sectors, pre_quotes, merchandises, agents, customers, contents, brands, mini_admins, banners
+from app.routers import users, sectors, pre_quotes, merchandises, agents, customers, contents, brands, mini_admins, banners, file_api
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -16,6 +16,7 @@ app.include_router(contents.router, prefix="/api", tags=["Content"])
 app.include_router(brands.router, prefix="/api", tags=["Brand"])
 app.include_router(mini_admins.router, prefix="/api", tags=["Mini Admin"])
 app.include_router(banners.router, prefix="/api", tags=["Banner"])
+app.include_router(file_api.router, prefix="/api", tags=["File_API"])
 origins = [
     "*"
 ]

@@ -15,7 +15,6 @@ router = APIRouter()
 
 @router.get("/pre_quote/get_one/{id}", response_model=dict)
 def get_pre_quote(id: int, db: Session = Depends(get_db)):
-    print('id', id)
     """Lấy thông tin combo."""
     combo = PreQuoteRepository.get_pre_quote_by_id(db, id)
     if not combo:

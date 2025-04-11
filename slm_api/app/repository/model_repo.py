@@ -483,6 +483,18 @@ class PreQuoteRepository:
         """Lấy PreQuote theo ID."""
         return db.query(PreQuote).options(joinedload(PreQuote.customer), joinedload(PreQuote.pre_quote_merchandises).joinedload(PreQuoteMerchandise.merchandise).joinedload(Merchandise.template)).filter(PreQuote.id == pre_quote_id).first()
     
+    @staticmethod
+    def get_pre_quote_by_id_with_brand(db: Session, pre_quote_id: int) -> PreQuote:
+        """Lấy PreQuote theo ID với brand."""
+        return db.query(PreQuote).options(
+            joinedload(PreQuote.customer), 
+            joinedload(PreQuote.pre_quote_merchandises).
+            joinedload(PreQuoteMerchandise.merchandise).
+            joinedload(Merchandise.template),
+            joinedload(PreQuote.pre_quote_merchandises)
+            .joinedload(PreQuoteMerchandise.merchandise)
+            .joinedload(Merchandise.brand)).filter(PreQuote.id == pre_quote_id).first()
+    
     
     @staticmethod
     def get_pre_quote_by_potential_customer_id(db: Session, potential_customer_id: int) -> PreQuote:
