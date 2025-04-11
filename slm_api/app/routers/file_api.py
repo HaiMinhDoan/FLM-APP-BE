@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get("/file/pre_quote_detail/{pre_quote_id}", response_class=HTMLResponse)
 def generate_pre_quote_detail_pdf(pre_quote_id:int, db: Session = Depends(get_db)):
     """API lấy file pdf chi tiết báo giá."""
-    combo = PreQuoteRepository.get_pre_quote_by_id_with_brand(db, id)
+    combo = PreQuoteRepository.get_pre_quote_by_id_with_brand(db, pre_quote_id=pre_quote_id)
     el_price = 3000
     electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, electric_price_id=1)
     storage_capacity_kwh = 0.0
