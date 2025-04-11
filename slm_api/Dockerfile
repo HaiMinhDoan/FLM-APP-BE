@@ -14,6 +14,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
+ENV XDG_RUNTIME_DIR=/tmp/runtime-root
+
 EXPOSE 8080
 
 # Chạy lệnh tạo bảng trước khi khởi động API

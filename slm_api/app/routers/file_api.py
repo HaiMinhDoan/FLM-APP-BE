@@ -12,6 +12,9 @@ from fastapi.templating import Jinja2Templates
 import pdfkit
 templates = Jinja2Templates(directory="app/templates")
 config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
+options = {
+    'no-stop-slow-scripts': None
+}
 router = APIRouter()
 
 
@@ -102,7 +105,7 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
     }
     html_content = templates.TemplateResponse("bao_gia_chi_tiet.html", params).body.decode()
     # Chuyển đổi HTML sang PDF
-    pdf = pdfkit.from_string(html_content, verbose=False,configuration=config)  # False để không lưu file
+    pdf = pdfkit.from_string(html_content, verbose=False,configuration=config, options=options)  # False để không lưu file
     # Trả về file PDF cho người dùng tải
     return Response(pdf, media_type='application/pdf', headers={"Content-Disposition": "attachment; filename=quote.pdf"})
     
