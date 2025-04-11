@@ -151,6 +151,10 @@
                         <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}">{{ outer_loop.index }}</td>
                         <td>{{ grouped_merchandise["template"]["name"] }}</td>
                     {% endif %}
+                    {% if loop.index != 1 %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
                     <td>{{ pre_quote_merchandise["merchandise"]["name"] }}</td>
                     <td>{{ pre_quote_merchandise["merchandise"]["brand"]["name"] }}</td>
                     <td>{{ pre_quote_merchandise["merchandise"]["unit"] }}</td>
