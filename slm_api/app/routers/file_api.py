@@ -26,6 +26,8 @@ options = {
     'disable-smart-shrinking': '',
     'header-html': 'app/templates/header.html',
     'footer-html': 'app/templates/footer.html',
+    'header-spacing': '5',   # spacing giữa header và nội dung (px)
+    'footer-spacing': '5',
     'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
 }
 router = APIRouter()
