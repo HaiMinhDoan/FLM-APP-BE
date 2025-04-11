@@ -1,7 +1,6 @@
 # Sử dụng Python 3.10 làm base image
 FROM python:3.13
 
-WORKDIR /slm_api
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
@@ -10,9 +9,12 @@ RUN apt-get update && apt-get install -y \
 
 
 # Copy requirements và cài đặt dependencies
+
+WORKDIR /slm_api
+COPY . /slm_api
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+
 
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
