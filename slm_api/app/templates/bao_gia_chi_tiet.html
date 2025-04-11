@@ -157,7 +157,11 @@
                     <td>{{ pre_quote_merchandise["quantity"] }}</td>
                     <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 | int}}</td>
                     <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"] | int}}</td>
-                    <td>{{ pre_quote_merchandise["warranty_years"] }} năm</td>
+                    <td style="white-space: nowrap;">
+                        {% if pre_quote_merchandise["warranty_years"] != 0 %}
+                            {{ pre_quote_merchandise["warranty_years"] }} năm
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         {% endfor %}
