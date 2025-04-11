@@ -291,6 +291,7 @@ class Content(Base):
     created_at = Column(DateTime, default=datetime.now)
     hashtag = Column(String(500), nullable=True)
     slug = Column(String(800), nullable=True)
+    all_agent = Column(Boolean, nullable=True)
     
     media_contents = relationship("MediaContent", back_populates="content", cascade="all, delete-orphan")
     category = relationship("ContentCategory")

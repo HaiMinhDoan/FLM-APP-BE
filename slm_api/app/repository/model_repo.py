@@ -818,11 +818,16 @@ class ContentRepository:
         )
     @staticmethod
     def get_contents_by_hashtag(db: Session, hashtag: str) -> List[Content]:
-        """Lấy danh sách tất cả Content theo hashtag."""
+        """Lấy danh sách tất cả Content theo hashtag hoặc có all_agent = True."""
         return (
             db.query(Content)
-            .options(joinedload(Content.media_contents),joinedload(Content.category))
-            .filter(Content.hashtag.like(f"%{hashtag}%"))
+            .options(joinedload(Content.media_contents), joinedload(Content.category))
+            .filter(
+                or_(
+                    Content.hashtag.like(f"%{hashtag}%"),
+                    Content.all_agent == True
+                )
+            )
             .all()
         )
     @staticmethod
