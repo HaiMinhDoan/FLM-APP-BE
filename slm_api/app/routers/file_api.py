@@ -10,26 +10,19 @@ import traceback
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
+import base64
+import os
+
+def image_to_base64(path):
+    with open(path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode('utf-8')
+    
+header_base64 = image_to_base64("app/templates/header.jpg")
+footer_base64 = image_to_base64("app/templates/footer.jpg")
+
 templates = Jinja2Templates(directory="app/templates")
 config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
-options = {
-    'no-stop-slow-scripts': None,
-    'debug-javascript': None,
-    'enable-local-file-access': '',
-    'page-size': 'A4',
-    'margin-top': '10mm',
-    'margin-right': '10mm',
-    'margin-bottom': '10mm',
-    'margin-left': '10mm',
-    'encoding': "UTF-8",
-    'no-outline': None,
-    'disable-smart-shrinking': '',
-    'header-html': 'app/templates/header.html',
-    'footer-html': 'app/templates/footer.html',
-    'header-spacing': '5',   # spacing giữa header và nội dung (px)
-    'footer-spacing': '5',
-    'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
-}
+
 router = APIRouter()
 
 
@@ -112,6 +105,33 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
         "power" : power,
         "combo": combo_dict,
         "storage_capacity_kwh" : storage_capacity_kwh
+    }
+    # render header/footer thành file tạm
+    header_html = templates.get_template("header.html").render({"header_base64": header_base64})
+    with open("app/templates/header_rendered.html", "w", encoding="utf-8") as f:
+        f.write(header_html)
+        
+    footer_html = templates.get_template("footer.html").render({"footer_base64": footer_base64})
+    with open("app/templates/footer_rendered.html", "w", encoding="utf-8") as f:
+        f.write(footer_html)
+    
+    options = {
+        'no-stop-slow-scripts': None,
+        'debug-javascript': None,
+        'enable-local-file-access': '',
+        'page-size': 'A4',
+        'margin-top': '10mm',
+        'margin-right': '10mm',
+        'margin-bottom': '10mm',
+        'margin-left': '10mm',
+        'encoding': "UTF-8",
+        'no-outline': None,
+        'disable-smart-shrinking': '',
+        'header-html': os.path.abspath("app/templates/header_rendered.html"),
+        'footer-html': os.path.abspath("app/templates/header_rendered.html"),
+        'header-spacing': '5',   # spacing giữa header và nội dung (px)
+        'footer-spacing': '5',
+        'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
     }
     html_content = templates.TemplateResponse("bao_gia_chi_tiet.html", params).body.decode()
     # Chuyển đổi HTML sang PDF
