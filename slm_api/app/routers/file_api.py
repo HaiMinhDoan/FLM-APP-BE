@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
 templates = Jinja2Templates(directory="app/templates")
-config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
+config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 router = APIRouter()
 
 
