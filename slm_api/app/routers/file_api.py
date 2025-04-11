@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from sqlalchemy.orm import Session
 from app.model.model import get_db
 from app.repository.model_repo import MerchandiseTemplateRepository
@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get("/file/pre_quote_detail/{pre_quote_id}", response_class=HTMLResponse)
-def generate_pre_quote_detail_pdf(pre_quote_id:int, db: Session = Depends(get_db)):
+def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session = Depends(get_db)):
     """API lấy file pdf chi tiết báo giá."""
     combo = PreQuoteRepository.get_pre_quote_by_id_with_brand(db, pre_quote_id=pre_quote_id)
     el_price = 3000
@@ -93,6 +93,7 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int, db: Session = Depends(get_db
     
     
     params = {
+        "request": request,
         "phase_type" : phase_type,
         "power" : power,
         "combo": combo_dict,
