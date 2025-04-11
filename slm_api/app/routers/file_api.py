@@ -23,18 +23,13 @@ router = APIRouter()
 def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session = Depends(get_db)):
     """API lấy file pdf chi tiết báo giá."""
     combo = PreQuoteRepository.get_pre_quote_by_id_with_brand(db, pre_quote_id=pre_quote_id)
-    el_price = 3000
-    electric_price = ElectricPriceRepository.get_electric_price_by_id(db=db, electric_price_id=1)
     storage_capacity_kwh = 0.0
     check_add_storage_capacity_kwh = False
-    if electric_price:
-        el_price = electric_price.price
     if not combo:
         raise HTTPException(status_code=404, detail="Combo not found")
     # Sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
     combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
     combo_dict = combo.__dict__.copy()
-    combo_dict["payback_period"] = combo.total_price/((combo.output_max+combo.output_min)/2*el_price*12)
     # Xử lý danh sách pre_quote_merchandises
     combo_dict["pre_quote_merchandises"] = []
     for pre_quote_merchandise in combo.pre_quote_merchandises:
