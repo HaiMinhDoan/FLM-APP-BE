@@ -24,6 +24,8 @@ options = {
     'encoding': "UTF-8",
     'no-outline': None,
     'disable-smart-shrinking': '',
+    'header-html': 'app/templates/header.html',
+    'footer-html': 'app/templates/footer.html',
     'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
 }
 router = APIRouter()
