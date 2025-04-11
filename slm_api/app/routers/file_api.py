@@ -12,6 +12,10 @@ from fastapi.templating import Jinja2Templates
 import pdfkit
 import base64
 import os
+header_path = os.path.abspath("app/templates/header_rendered.html")
+footer_path = os.path.abspath("app/templates/footer_rendered.html")
+print("Header file exists:", os.path.exists(header_path))
+print("Footer file exists:", os.path.exists(footer_path))
 
 def image_to_base64(path):
     with open(path, "rb") as img_file:
@@ -127,8 +131,8 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
         'encoding': "UTF-8",
         'no-outline': None,
         'disable-smart-shrinking': '',
-        'header-html': f"file://{os.path.abspath('app/templates/header_rendered.html')}",
-        'footer-html': f"file://{os.path.abspath('app/templates/footer_rendered.html')}",
+        'header-html': os.path.abspath("app/templates/header_rendered.html"),
+        'footer-html': os.path.abspath("app/templates/footer_rendered.html"),
         'header-spacing': '5',   # spacing giữa header và nội dung (px)
         'footer-spacing': '5',
         'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
