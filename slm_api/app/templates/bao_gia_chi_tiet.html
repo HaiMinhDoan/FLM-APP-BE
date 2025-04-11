@@ -143,11 +143,12 @@
             <th>THÀNH TIỀN</th>
             <th>BẢO HÀNH</th>
         </tr>
-        {%for grouped_merchandise in combo["grouped_merchandises"] %}
-            {%for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
+        {% for grouped_merchandise in combo["grouped_merchandises"] %}
+            {% set outer_loop = loop %}
+            {% for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
                 <tr>
                     {% if loop.index == 1 %}
-                        <td rowspan='{{ grouped_merchandise["pre_quote_merchandises"].length }}"'>{{ loop.parent.index }}</td>
+                        <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}">{{ outer_loop.index }}</td>
                         <td>{{ grouped_merchandise["template"]["name"] }}</td>
                     {% endif %}
                     <td>{{ pre_quote_merchandise["merchandise"]["name"] }}</td>
@@ -155,11 +156,12 @@
                     <td>{{ pre_quote_merchandise["merchandise"]["unit"] }}</td>
                     <td>{{ pre_quote_merchandise["quantity"] }}</td>
                     <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 }}</td>
-                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"]}}</td>
+                    <td>{{ ((pre_quote_merchandise["price_on_gm"] + 9999) // 10000) * 10000 * pre_quote_merchandise["quantity"] }}</td>
                     <td>{{ pre_quote_merchandise["warranty_years"] }}</td>
                 </tr>
             {% endfor %}
         {% endfor %}
+
         <tr class="total-row">
             <td colspan="6">TỔNG CỘNG GIÁ TRỊ TRỌN GÓI VẬT TƯ THIẾT BỊ - VẬN CHUYỂN - LẮP ĐẶT - BẢO HÀNH (Đã bao gồm VAT 10%)</td>
             <td></td>
