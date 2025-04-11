@@ -14,8 +14,6 @@ import base64
 import os
 header_path = os.path.abspath("app/templates/header_rendered.html")
 footer_path = os.path.abspath("app/templates/footer_rendered.html")
-print("Header file exists:", os.path.exists(header_path))
-print("Footer file exists:", os.path.exists(footer_path))
 
 def image_to_base64(path):
     with open(path, "rb") as img_file:
@@ -137,6 +135,8 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
         'footer-spacing': '5',
         'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
     }
+    print("Header file exists:", os.path.exists(header_path))
+    print("Footer file exists:", os.path.exists(footer_path))
     html_content = templates.TemplateResponse("bao_gia_chi_tiet.html", params).body.decode()
     # Chuyển đổi HTML sang PDF
     pdf = pdfkit.from_string(html_content, verbose=False,configuration=config, options=options)  # False để không lưu file
