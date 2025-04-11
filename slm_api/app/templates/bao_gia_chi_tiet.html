@@ -148,8 +148,12 @@
             {% for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
                 <tr>
                     {% if loop.index == 1 %}
-                        <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}">{{ outer_loop.index }}</td>
-                        <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}">{{ grouped_merchandise["template"]["name"] }}</td>
+                        <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}" style="vertical-align: middle; text-align: center;">
+                            {{ outer_loop.index }}
+                        </td>
+                        <td rowspan="{{ grouped_merchandise['pre_quote_merchandises'] | length }}" style="vertical-align: middle; text-align: center;">
+                            {{ grouped_merchandise["template"]["name"] }}
+                        </td>
                     {% endif %}
                     <td>{{ pre_quote_merchandise["merchandise"]["name"] }}</td>
                     <td>{{ pre_quote_merchandise["merchandise"]["brand"]["name"] }}</td>
