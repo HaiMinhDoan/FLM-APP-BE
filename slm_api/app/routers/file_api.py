@@ -108,11 +108,11 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
     }
     # render header/footer thành file tạm
     header_html = templates.get_template("header.html").render({"header_base64": header_base64})
-    with open("/app/templates/header_rendered.html", "w", encoding="utf-8") as f:
+    with open("app/templates/header_rendered.html", "w", encoding="utf-8") as f:
         f.write(header_html)
         
     footer_html = templates.get_template("footer.html").render({"footer_base64": footer_base64})
-    with open("/app/templates/footer_rendered.html", "w", encoding="utf-8") as f:
+    with open("app/templates/footer_rendered.html", "w", encoding="utf-8") as f:
         f.write(footer_html)
     
     options = {
