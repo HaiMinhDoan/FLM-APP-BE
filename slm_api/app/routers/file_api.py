@@ -14,7 +14,8 @@ templates = Jinja2Templates(directory="app/templates")
 config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 options = {
     'no-stop-slow-scripts': None,
-    'debug-javascript': None
+    'debug-javascript': None,
+    "enable-local-file-access": None
 }
 router = APIRouter()
 
