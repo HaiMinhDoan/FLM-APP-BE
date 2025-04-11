@@ -10,7 +10,7 @@ import traceback
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 router = APIRouter()
 
 
