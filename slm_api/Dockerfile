@@ -3,18 +3,21 @@ FROM python:3.13
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    wkhtmltopdf \
+    wget \
     libxrender1 libxext6 libfontconfig1 libjpeg62-turbo \
+    xfonts-75dpi xfonts-base \
     && apt-get clean
 
+# Cài đặt wkhtmltopdf có Qt patched
+RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bookworm_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6-1.bookworm_amd64.deb \
+    && rm wkhtmltox_0.12.6-1.bookworm_amd64.deb
 
 # Copy requirements và cài đặt dependencies
-
 WORKDIR /slm_api
 COPY . /slm_api
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
