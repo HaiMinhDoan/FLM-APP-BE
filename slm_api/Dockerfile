@@ -1,16 +1,25 @@
 # Sử dụng Python 3.13 làm base image
 FROM python:3.13-bullseye
 
-# Cài wkhtmltopdf và các phụ thuộc
+# Cài wkhtmltopdf with patched Qt (bản 0.12.6)
 RUN apt-get update && \
-    apt-get install -y wget xfonts-75dpi xfonts-base fontconfig libjpeg62-turbo libxrender1 libxext6 libssl1.1 && \
-    wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6/wkhtmltox_0.12.6-1.bionic_amd64.deb && \
+    apt-get install -y \
+        wget \
+        xfonts-75dpi \
+        xfonts-base \
+        fontconfig \
+        libjpeg62-turbo \
+        libxrender1 \
+        libxext6 \
+        libssl1.1 && \
+    wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb && \
     apt install -y ./wkhtmltox_0.12.6-1.bionic_amd64.deb && \
     rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
 
+
 # Copy requirements và cài đặt dependencies
-WORKDIR /slm_api
+WORKDIR /app
 COPY . .
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
