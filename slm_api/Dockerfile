@@ -3,35 +3,12 @@
 FROM python:3.13 as python-base
 
 
-# Cài đặt các phụ thuộc cần thiết
 RUN apt-get update && \
-    apt-get install -y \
-    build-essential \
-    libfontconfig1 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libx11-6 \
-    libxext6 \
-    libxrender1 \
-    xfonts-75dpi \
-    xfonts-base \
-    qtbase5-dev \
-    qtchooser \
-    qt5-qmake \
-    qtbase5-dev-tools \
-    wget \
-    ca-certificates && \
-    apt-get clean
+    apt-get install -y wget xfonts-75dpi xfonts-base && \
+    wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
+    dpkg -i wkhtmltox_0.12.6-1.focal_amd64.deb || apt-get -fy install && \
+    rm wkhtmltox_0.12.6-1.focal_amd64.deb
 
-# Tải và biên dịch wkhtmltopdf
-RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox-0.12.6.1-3.almalinux8.aarch64.rpm && \
-    dpkg -i wkhtmltox-0.12.6.1-3.almalinux8.aarch64.rpm && \
-    apt-get install -f && \
-    rm wkhtmltox-0.12.6.1-3.almalinux8.aarch64.rpm
-
-
-# Cài đặt pip nếu chưa có
-RUN apt-get update && apt-get install -y python3-pip
 
 # Copy requirements và cài đặt dependencies
 WORKDIR /slm_api
