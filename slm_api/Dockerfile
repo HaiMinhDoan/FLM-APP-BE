@@ -1,11 +1,13 @@
 # Sử dụng Python 3.13 làm base image
-FROM python:3.13
+FROM python:3.13 as python-base
 
 FROM openlabs/docker-wkhtmltopdf:latest
 
+# Cài đặt pip nếu chưa có
+RUN apt-get update && apt-get install -y python3-pip
 
 # Copy requirements và cài đặt dependencies
-WORKDIR /app
+WORKDIR /slm_api
 COPY . .
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
