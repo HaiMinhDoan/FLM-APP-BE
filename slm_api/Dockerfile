@@ -5,10 +5,13 @@ RUN apt-get update && \
     apt-get install -y python3 python3-pip && \
     apt-get clean
 
+# Kiểm tra phiên bản pip để đảm bảo pip hoạt động
+RUN python3 -m pip --version
+
 # Cài đặt các phụ thuộc Python
 WORKDIR /slm_api
 COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 # Cấu hình môi trường và lệnh khởi động
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
