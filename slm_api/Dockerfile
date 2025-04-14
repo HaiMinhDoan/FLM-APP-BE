@@ -1,22 +1,7 @@
 # Sử dụng Python 3.13 làm base image
-FROM python:3.13-bullseye
+FROM python:3.13
 
-# Thêm archive của Debian 11 để lấy libssl1.1
-RUN echo "deb http://archive.debian.org/debian bullseye main" >> /etc/apt/sources.list && \
-    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
-    apt-get update && \
-    apt-get install -y \
-        wget \
-        xfonts-75dpi \
-        xfonts-base \
-        fontconfig \
-        libjpeg62-turbo \
-        libxrender1 \
-        libxext6 \
-        libssl1.1 && \
-    wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb && \
-    apt install -y ./wkhtmltox_0.12.6-1.bionic_amd64.deb && \
-    rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+FROM openlabs/docker-wkhtmltopdf:latest
 
 
 # Copy requirements và cài đặt dependencies
