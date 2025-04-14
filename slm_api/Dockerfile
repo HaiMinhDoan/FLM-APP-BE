@@ -1,4 +1,4 @@
-# Sử dụng Python 3.10 làm base image
+# Sử dụng Python 3.13 làm base image
 FROM python:3.13
 
 FROM openlabs/docker-wkhtmltopdf:latest
