@@ -1,7 +1,7 @@
-# Sử dụng Python 3.13 làm base image
-FROM python:3.13 as python-base
 
 FROM openlabs/docker-wkhtmltopdf:latest
+# Sử dụng Python 3.13 làm base image
+FROM python:3.13 as python-base
 
 # Cài đặt pip nếu chưa có
 RUN apt-get update && apt-get install -y python3-pip
