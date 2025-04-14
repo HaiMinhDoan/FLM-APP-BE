@@ -13,11 +13,10 @@ RUN apt-get update && \
     libjpeg62-turbo \
     libxrender1 \
     libxext6 \
-    libssl1.1 \
+    libssl3 \
     ca-certificates \
     libfontconfig1 \
-    libx11-6 \
-    libxrender1 && \
+    libx11-6 && \
     apt-get clean
 
 # Tải và cài đặt wkhtmltopdf with patched qt
@@ -25,6 +24,7 @@ RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6/wkh
     dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb && \
     apt-get install -f && \
     rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+
 
 # Cài đặt pip nếu chưa có
 RUN apt-get update && apt-get install -y python3-pip
