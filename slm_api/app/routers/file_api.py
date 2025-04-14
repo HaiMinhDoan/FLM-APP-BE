@@ -141,6 +141,7 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
     }
     print(f"Docker container paths - Header: {header_path}, Footer: {footer_path}")
     print(f"Files exist - Header: {os.path.exists(header_path)}, Footer: {os.path.exists(footer_path)}")
+    print(wkhtmltopdf_path)
     html_content = templates.TemplateResponse("bao_gia_chi_tiet.html", params).body.decode()
     # Chuyển đổi HTML sang PDF
     pdf = pdfkit.from_string(html_content, False, verbose=False,configuration=config, options=options)  # False để không lưu file
