@@ -9,9 +9,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Cài đặt wkhtmltopdf có Qt patched
-RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bookworm_amd64.deb \
-    && dpkg -i wkhtmltox_0.12.6-1.bookworm_amd64.deb \
-    && rm wkhtmltox_0.12.6-1.bookworm_amd64.deb
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
+    && tar xvf wkhtmltox*.tar.xz \
+    && sudo mv wkhtmltox/bin/wkhtmlto* /usr/bin \
+    && sudo apt-get install -y openssl build-essential libssl-dev libxrender-dev git-core libx11-dev libxext-dev libfontconfig1-dev libfreetype6-dev fontconfig
 
 # Copy requirements và cài đặt dependencies
 WORKDIR /slm_api
