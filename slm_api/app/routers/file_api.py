@@ -6,7 +6,6 @@ from app.repository.model_repo import MerchandiseTemplateRepository
 from app.repository.model_repo import  PreQuoteRepository, PreQuoteMerchandiseRepository, CustomerRepository, UserRepository, CommissionRepository, ElectricPriceRepository
 from app.model.dto import ContractCreateDTO, PreQuoteMerchandiseCreateDTO, ComboCreateDTO
 from typing import List
-import traceback
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
@@ -25,7 +24,7 @@ header_base64 = image_to_base64("app/templates/header.jpg")
 footer_base64 = image_to_base64("app/templates/footer.jpg")
 
 templates = Jinja2Templates(directory="app/templates")
-config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
+# config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 
 router = APIRouter()
 
