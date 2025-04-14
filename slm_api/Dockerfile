@@ -1,8 +1,10 @@
 # Sử dụng Python 3.13 làm base image
 FROM python:3.13-bullseye
 
-# Cài wkhtmltopdf with patched Qt (bản 0.12.6)
-RUN apt-get update && \
+# Thêm archive của Debian 11 để lấy libssl1.1
+RUN echo "deb http://archive.debian.org/debian bullseye main" >> /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
+    apt-get update && \
     apt-get install -y \
         wget \
         xfonts-75dpi \
@@ -17,9 +19,8 @@ RUN apt-get update && \
     rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
 
-
 # Copy requirements và cài đặt dependencies
-WORKDIR /app
+WORKDIR /slm_api
 COPY . .
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
