@@ -1,6 +1,6 @@
 
 # Sử dụng Python 3.13 làm base image
-FROM python:3.13 as python-base
+FROM python:3.13
 
 
 RUN apt-get update && \
@@ -14,7 +14,7 @@ RUN apt-get update && \
 WORKDIR /slm_api
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+COPY . /app
 
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
