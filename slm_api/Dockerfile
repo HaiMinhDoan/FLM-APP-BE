@@ -3,27 +3,31 @@
 FROM python:3.13 as python-base
 
 
-# Cài đặt các phụ thuộc hệ thống cần thiết cho wkhtmltopdf và các thư viện hỗ trợ
+# Cài đặt các phụ thuộc cần thiết
 RUN apt-get update && \
     apt-get install -y \
-    wget \
+    build-essential \
+    libfontconfig1 \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
     xfonts-75dpi \
     xfonts-base \
-    fontconfig \
-    libjpeg62-turbo \
-    libxrender1 \
-    libxext6 \
-    libssl3 \
-    ca-certificates \
-    libfontconfig1 \
-    libx11-6 && \
+    qtbase5-dev \
+    qtchooser \
+    qt5-qmake \
+    qtbase5-dev-tools \
+    wget \
+    ca-certificates && \
     apt-get clean
 
-# Tải và cài đặt wkhtmltopdf with patched qt
-RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6/wkhtmltox_0.12.6-1.bionic_amd64.deb && \
-    dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb && \
+# Tải và biên dịch wkhtmltopdf
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6.1-2/jammy/wkhtmltox_0.12.6.1-2.jammy_amd64.deb && \
+    dpkg -i wkhtmltox_0.12.6.1-2.jammy_amd64.deb && \
     apt-get install -f && \
-    rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+    rm wkhtmltox_0.12.6.1-2.jammy_amd64.deb
 
 
 # Cài đặt pip nếu chưa có
