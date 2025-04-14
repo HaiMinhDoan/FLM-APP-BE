@@ -14,7 +14,7 @@ RUN apt-get update && \
 WORKDIR /slm_api
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . /
+COPY . .
 
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
