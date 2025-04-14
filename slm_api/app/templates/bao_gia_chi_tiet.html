@@ -215,7 +215,7 @@
             {% set outer_loop = loop %}
             {% for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
                 <div class="product-item">
-                    <img src='{{ pre_quote_merchandise["merchandise"]["images"][0] }}' alt="Inverter Solis" class="product-img">
+                    <img src='{{ pre_quote_merchandise["merchandise"]["images"][0]["link"] }}' alt="Inverter Solis" class="product-img">
                     <p>{{ pre_quote_merchandise["merchandise"]["name"] }} (BH: {{ pre_quote_merchandise["warranty_years"] }} NĂM)</p>
                 </div>
             {%endfor%}
