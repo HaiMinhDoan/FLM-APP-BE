@@ -6,7 +6,7 @@ FROM openlabs/docker-wkhtmltopdf:latest
 
 # Copy requirements và cài đặt dependencies
 WORKDIR /slm_api
-COPY . /slm_api
+COPY . .
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
