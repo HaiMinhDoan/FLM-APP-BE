@@ -1,37 +1,9 @@
 
-# Sử dụng Python 3.13 làm base image
-FROM python:3.13 as python-base
+FROM openlabs/docker-wkhtmltopdf:latest
 
-
-# Cài đặt các phụ thuộc cần thiết
+# Cài đặt Python và pip
 RUN apt-get update && \
-    apt-get install -y \
-    build-essential \
-    libfontconfig1 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libx11-6 \
-    libxext6 \
-    libxrender1 \
-    xfonts-75dpi \
-    xfonts-base \
-    qtbase5-dev \
-    qtchooser \
-    qt5-qmake \
-    qtbase5-dev-tools \
-    wget \
-    ca-certificates && \
-    apt-get clean
-
-# Tải và biên dịch wkhtmltopdf
-RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6.1-2/jammy/wkhtmltox_0.12.6.1-2.jammy_amd64.deb && \
-    dpkg -i wkhtmltox_0.12.6.1-2.jammy_amd64.deb && \
-    apt-get install -f && \
-    rm wkhtmltox_0.12.6.1-2.jammy_amd64.deb
-
-
-# Cài đặt pip nếu chưa có
-RUN apt-get update && apt-get install -y python3-pip
+    apt-get install -y python3 python3-pip
 
 # Copy requirements và cài đặt dependencies
 WORKDIR /slm_api
