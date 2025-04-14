@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 import pdfkit
 import base64
 import os
+import shutil
 app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 header_path = os.path.join(app_root, "templates", "header_rendered.html")
@@ -24,7 +25,9 @@ header_base64 = image_to_base64("app/templates/header.jpg")
 footer_base64 = image_to_base64("app/templates/footer.jpg")
 
 templates = Jinja2Templates(directory="app/templates")
+wkhtmltopdf_path = shutil.which('wkhtmltopdf')
 # config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
+config = pdfkit.configuration(wkhtmltopdf = wkhtmltopdf_path)
 
 router = APIRouter()
 
