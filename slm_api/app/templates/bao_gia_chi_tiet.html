@@ -211,19 +211,15 @@
     <h3 class="">DANH SÁCH VẬT LIỆU CHI TIẾT</h3>
 
     <div class="product-gallery">
-        <div class="product-item">
-            <img src="https://th.bing.com/th/id/R.2d1bf50167bbc01e5720092084ee3bf9?rik=xB9kSLFCBDfcOA&riu=http%3a%2f%2fthuthuatphanmem.vn%2fuploads%2f2018%2f09%2f11%2fhinh-anh-dep-6_044127357.jpg&ehk=g1hC5ADWBCALT4vPZWI4M%2fmjOeSVF32fzLUV6Iw7aN4%3d&risl=&pid=ImgRaw&r=0" 
-            alt="Solar Panel" class="product-img">
-            <p>Solar Panel (BH: 12 NĂM)</p>
-        </div>
-        <div class="product-item">
-            <img src="" alt="Inverter Solis" class="product-img">
-            <p>Inverter Solis (BH: 05 NĂM)</p>
-        </div>
-        <div class="product-item">
-            <img src="" alt="Pin Lithium Dyness" class="product-img">
-            <p>Pin Lithium Dyness (BH: 05 NĂM)</p>
-        </div>
+        {% for grouped_merchandise in combo["grouped_merchandises"] %}
+            {% set outer_loop = loop %}
+            {% for pre_quote_merchandise in grouped_merchandise["pre_quote_merchandises"] %}
+                <div class="product-item">
+                    <img src='{{ pre_quote_merchandise["merchandise"]["images"][0] }}' alt="Inverter Solis" class="product-img">
+                    <p>{{ pre_quote_merchandise["merchandise"]["name"] }} (BH: {{ pre_quote_merchandise["warranty_years"] }} NĂM)</p>
+                </div>
+            {%endfor%}
+        {%endfor%}
     </div>
 
     <div class="product-grid">
