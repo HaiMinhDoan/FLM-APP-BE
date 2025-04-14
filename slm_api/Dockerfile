@@ -11,7 +11,7 @@ RUN python3 -m pip --version
 # Cài đặt các phụ thuộc Python
 WORKDIR /slm_api
 COPY requirements.txt .
-RUN python3 -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Cấu hình môi trường và lệnh khởi động
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
