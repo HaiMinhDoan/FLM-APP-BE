@@ -1,5 +1,5 @@
 # Sử dụng Python 3.13 làm base image
-FROM python:3.13
+FROM python:3.13-bullseye
 
 # Cài wkhtmltopdf và các phụ thuộc
 RUN apt-get update && \
