@@ -12,8 +12,10 @@ from fastapi.templating import Jinja2Templates
 import pdfkit
 import base64
 import os
-header_path = os.path.abspath("app/templates/header_rendered.html")
-footer_path = os.path.abspath("app/templates/footer_rendered.html")
+app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+header_path = os.path.join(app_root, "templates", "header_rendered.html")
+footer_path = os.path.join(app_root, "templates", "footer_rendered.html")
 
 def image_to_base64(path):
     with open(path, "rb") as img_file:
@@ -129,17 +131,17 @@ def generate_pre_quote_detail_pdf(pre_quote_id:int,request: Request, db: Session
         'encoding': "UTF-8",
         'no-outline': None,
         'disable-smart-shrinking': '',
-        'header-html': os.path.abspath("app/templates/header_rendered.html"),
-        'footer-html': os.path.abspath("app/templates/footer_rendered.html"),
+        'header-html': header_path,
+        'footer-html': footer_path,
         'header-spacing': '5',   # spacing giữa header và nội dung (px)
         'footer-spacing': '5',
         'print-media-type': '',  # <- Cho phép xử lý CSS in ấn (media="print")
     }
-    print("Header file exists:", os.path.exists(header_path))
-    print("Footer file exists:", os.path.exists(footer_path))
+    print(f"Docker container paths - Header: {header_path}, Footer: {footer_path}")
+    print(f"Files exist - Header: {os.path.exists(header_path)}, Footer: {os.path.exists(footer_path)}")
     html_content = templates.TemplateResponse("bao_gia_chi_tiet.html", params).body.decode()
     # Chuyển đổi HTML sang PDF
-    pdf = pdfkit.from_string(html_content, verbose=False,configuration=config, options=options)  # False để không lưu file
+    pdf = pdfkit.from_string(html_content, False, verbose=False,configuration=config, options=options)  # False để không lưu file
     # Trả về file PDF cho người dùng tải
     return Response(pdf, media_type='application/pdf', headers={"Content-Disposition": "attachment; filename=quote.pdf"})
     
