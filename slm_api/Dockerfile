@@ -2,7 +2,10 @@
 # Sử dụng Python 3.13 làm base image
 FROM python:3.13
 
-
+RUN apt-get update && apt-get install -y \
+    wkhtmltopdf \
+    libxrender1 libxext6 libfontconfig1 libjpeg62-turbo \
+    && apt-get clean
 
 
 # Copy requirements và cài đặt dependencies
