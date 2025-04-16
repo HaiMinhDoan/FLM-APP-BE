@@ -21,18 +21,53 @@ def get_pre_quote(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Combo not found")
     combo_dict = combo.__dict__.copy()
     combo_dict["pre_quote_merchandises"] = []
+    # Sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
+    combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
+    combo_dict = combo.__dict__.copy()
+    combo_dict["payback_period"] = combo.total_price/((combo.output_max+combo.output_min)/2*el_price*12)
+    # Xử lý danh sách pre_quote_merchandises
+    combo_dict["pre_quote_merchandises"] = []
     for pre_quote_merchandise in combo.pre_quote_merchandises:
         pre_quote_merchandise_dict = pre_quote_merchandise.__dict__.copy()
+        pre_quote_merchandise_dict["price_on_gm"] = pre_quote_merchandise_dict["price"]/(1-pre_quote_merchandise_dict["gm"]/100)
         merchandise_dict = pre_quote_merchandise.merchandise.__dict__.copy()
+        brand_dict = pre_quote_merchandise.merchandise.brand.__dict__.copy()
+        brand_dict.pop("_sa_instance_state", None)
+        merchandise_dict["brand"] = brand_dict
         merchandise_dict.pop("_sa_instance_state", None)
         merchandise_dict["data_json"] = json.loads(merchandise_dict["data_json"])
+        images = pre_quote_merchandise.merchandise.images
+        images_dict = []
+        for image in images:
+            image_dict = image.__dict__.copy()
+            image_dict.pop("_sa_instance_state", None)
+            images_dict.append(image_dict)
+        merchandise_dict["images"] = images_dict.copy()
+        pre_quote_merchandise.merchandise.template.structure_json = None
+        merchandise_template_dict = pre_quote_merchandise.merchandise.template.__dict__.copy()
+        merchandise_template_dict.pop("_sa_instance_state", None)
+        merchandise_dict["template"] = merchandise_template_dict
         pre_quote_merchandise_dict["merchandise"] = merchandise_dict
         pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
         pre_quote_merchandise_dict.pop("_sa_instance_state", None)
         combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
-    if(combo.customer):
-        combo_dict["customer"] = combo.customer.__dict__.copy()
-        combo_dict["customer"].pop("_sa_instance_state", None)
+                
+    grouped_merchandises = {}
+    for pre_quote_merchandise in combo_dict["pre_quote_merchandises"]:
+        template_id = pre_quote_merchandise["merchandise"]["template"]["id"]
+        if template_id not in grouped_merchandises:
+            grouped_merchandises[template_id] = {
+                "template": pre_quote_merchandise["merchandise"]["template"],
+                "pre_quote_merchandises": []
+            }
+        grouped_merchandises[template_id]["pre_quote_merchandises"].append(pre_quote_merchandise)
+
+        combo_dict["grouped_merchandises"] = list(grouped_merchandises.values())
+    #sắp xếp combo_dict["grouped_merchandises"] them template.id
+    combo_dict["grouped_merchandises"] = sorted(
+        combo_dict["grouped_merchandises"], key=lambda x: x["template"]["id"]
+    )
+    combo_dict["pre_quote_merchandises"] =[]
     combo_dict.pop("_sa_instance_state", None)
     return combo_dict
 
