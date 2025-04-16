@@ -20,6 +20,9 @@ def get_pre_quote(id: int, db: Session = Depends(get_db)):
     if not combo:
         raise HTTPException(status_code=404, detail="Combo not found")
     combo_dict = combo.__dict__.copy()
+    customer_dict = combo.customer.__dict__.copy()
+    customer_dict.pop("_sa_instance_state", None)
+    combo_dict["customer"] = customer_dict
     combo_dict["pre_quote_merchandises"] = []
     # Sắp xếp pre_quote_merchandises theo thứ tự tăng dần id
     combo.pre_quote_merchandises = sorted(combo.pre_quote_merchandises, key=lambda x: x.id)
@@ -50,7 +53,7 @@ def get_pre_quote(id: int, db: Session = Depends(get_db)):
         pre_quote_merchandise_dict["merchandise"].pop("_sa_instance_state", None)
         pre_quote_merchandise_dict.pop("_sa_instance_state", None)
         combo_dict["pre_quote_merchandises"].append(pre_quote_merchandise_dict)
-                
+    
     grouped_merchandises = {}
     for pre_quote_merchandise in combo_dict["pre_quote_merchandises"]:
         template_id = pre_quote_merchandise["merchandise"]["template"]["id"]
