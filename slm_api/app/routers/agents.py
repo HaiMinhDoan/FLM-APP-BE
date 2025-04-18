@@ -82,13 +82,7 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
     total_turnover = 0
     for child in children:
         child_turnover = 0
-        customers = CustomerRepository.get_customer_by_sale_id(db=db, sale_id=child.id)
-        for customer in customers:
-            cus_contracts = PreQuoteRepository.get_contract_quote_by_buyer_id_and_sector(db=db, sector="SLM", buyer_id=customer.id)
-            for cus_contract in cus_contracts:
-                total_turnover += cus_contract.total_price
-                child_turnover += cus_contract.total_price
-                
+        
         child_dict = child.__dict__.copy()
         commissions = child.commissions
         commissions_dict = []
@@ -97,6 +91,8 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
             commission_dict = commission.__dict__.copy()
             commission_dict.pop('_sa_instance_state', None)
             commissions_dict.append(commission_dict)
+            total_turnover += commission.money
+            total_turnover += commission.money
         child_dict['commissions'] = commissions_dict
         child_dict['child_turnover'] = child_turnover
         child_dict.pop('_sa_instance_state', None)
