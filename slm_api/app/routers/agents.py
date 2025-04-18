@@ -91,9 +91,11 @@ def get_downlines(id: int, db: Session = Depends(get_db)):
             commission_dict = commission.__dict__.copy()
             commission_dict.pop('_sa_instance_state', None)
             commissions_dict.append(commission_dict)
+            print(commission.contract_id)
             contract_temp = PreQuoteRepository.get_pre_quote_by_id_simple(db=db,pre_quote_id=commission.contract_id)
-            child_turnover += contract_temp.total_price
-            total_turnover += contract_temp.total_price
+            if contract_temp:
+                child_turnover += contract_temp.total_price
+                total_turnover += contract_temp.total_price
         child_dict['commissions'] = commissions_dict
         child_dict['child_turnover'] = child_turnover
         child_dict.pop('_sa_instance_state', None)
