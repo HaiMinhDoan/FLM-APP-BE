@@ -305,6 +305,7 @@ class Commission(Base):
     sector_id = Column(Integer, ForeignKey('sectors.id') , nullable=True)
     paid = Column(Boolean,nullable=True, default=False)
     contract_id = Column(Integer, nullable=True)
+    direct = Column(Boolean, nullable=True) 
     
     sector = relationship("Sector")
     user = relationship("User", back_populates="commissions")
