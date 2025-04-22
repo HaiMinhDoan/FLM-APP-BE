@@ -281,3 +281,4 @@ class PotentialCustomerCreateDTO(BaseModel):
     ward: Optional[str] = Field(...,description="Phường của khách hàng")
     interested_in_combo_id: Optional[int] = Field(...,description="ID của combo quan tâm")
     description: Optional[str] = Field(...,description="Nội dung chi tiết")
+    interested_in_combos: Optional[str] = Field(..., description="Danh sách mã của combo")

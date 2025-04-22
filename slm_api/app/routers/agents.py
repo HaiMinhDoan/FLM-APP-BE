@@ -201,7 +201,7 @@ def create_new_potential_customer(potential_customer_data: PotentialCustomerCrea
                     "district": potential_customer_data.district,
                     "ward": potential_customer_data.ward,
                     "interested_in_combo_id": potential_customer_data.interested_in_combo_id,
-                    "description": potential_customer_data.description,
+                    "description": potential_customer_data.description
                 },
             )
 
@@ -230,3 +230,28 @@ def get_potential_customers(agent_id: int, db: Session = Depends(get_db)):
         potential_customer_dict.pop('_sa_instance_state', None)
         potential_customers_dict.append(potential_customer_dict)
     return potential_customers_dict
+
+@router.delete("/agents/delete-potential-customers/{potential_customer_id}", response_model=dict)
+def delete_potential_customer(potential_customer_id: int, db: Session = Depends(get_db)):
+    """Xoá một khách hàng tiềm năng."""
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Lấy thông tin khách hàng tiềm năng
+            potential_customer = PotentialCustomerRepository.get_potential_customer_by_id(
+                db=db, potential_customer_id=potential_customer_id
+            )
+            if not potential_customer:
+                raise HTTPException(status_code=404, detail="Potential customer not found")
+            # Xoá khách hàng tiềm năng
+            PotentialCustomerRepository.delete_potential_customer(db=db, potential_customer_id=potential_customer_id)
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"success": True}
+    except HTTPException as http_exc:
+        # Trả về lỗi HTTPException nếu có
+        raise http_exc
+    except Exception as e:
+        # Xử lý lỗi không mong muốn
+        print("Error occurred while deleting potential customer:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
