@@ -243,6 +243,8 @@ class PreQuote(Base):
     phase_type = Column(String(100), nullable=True, default="")
     output_max = Column(Integer, nullable=True, default=0)
     output_min = Column(Integer, nullable=True, default=0)
+    iron_frame_price = Column(Float, nullable=True, default=0)
+    iron_installation_price = Column(Float,nullable=True,default=0)
     
     customer = relationship("Customer", back_populates="pre_quotes")
     pre_quote_merchandises = relationship("PreQuoteMerchandise", cascade="all, delete-orphan", back_populates="pre_quote")

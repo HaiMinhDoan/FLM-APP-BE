@@ -200,6 +200,8 @@ class PreQuoteCreateDTO(BaseModel):
     installation_type : str = Field(..., description="Loại lắp đặt")
     total_price: Optional[float] = Field(..., description="Tổng giá")
     kind : str = Field(..., description="Loại")
+    iron_frame_price: float = Field(None, description="Giá khung sắt")
+    iron_installation_price: float = Field(None, description="Giá nhân công khung sắt")
     
     image: Optional[str] = Field(..., description="Ảnh")
     
