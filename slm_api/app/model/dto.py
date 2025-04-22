@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Any, List
-from datetime import datetime
+from datetime import datetime, date
 
 
 class UserLoginDTO(BaseModel):
@@ -129,7 +129,11 @@ class UserUpdateDTO(BaseModel):
     full_name: Optional[str] = Field(None, max_length=255, description="Họ tên")
     email: Optional[str] = Field(None, max_length=255, description="Email")
     phone: Optional[str] = Field(None, max_length=20, description="Số điện thoại")
-    role_id: Optional[int] = Field(None, max_length=50, description="Vai trò")
+    address: Optional[str] = Field(None, max_length=100, description="Địa chỉ khách hàng")
+    citizen_id: Optional[str] = Field(None,max_length=100, description="Mã căn cước")
+    dob: Optional[date] = Field(None, description="Ngày tháng năm sinh")
+    bank_name: Optional[str] = Field(None, description="Tên ngân hàng thụ hưởng")
+    bank_code: Optional[str] = Field(None, description="Số tài khoản khách hàng")
     
 class NotificationDTO(BaseModel):
     """DTO cho việc tạo mới Notification."""

@@ -6,7 +6,7 @@ from app.repository.model_repo import UserRepository, LoginHistoryRepository, No
 from app.model.dto import UserCreateDTO, UserUpdateDTO, UserLoginDTO
 from typing import List
 from datetime import datetime
-import json
+import json, traceback
 router = APIRouter()
 
 
@@ -127,10 +127,24 @@ def get_user(id: int, db: Session = Depends(get_db)):
 @router.put("/users/{id}", response_model=dict)
 def update_user(id: int, user_data: UserUpdateDTO, db: Session = Depends(get_db)):
     """Cập nhật thông tin người dùng."""
-    updated_user = UserRepository.update_user(db, id, user_data.dict(exclude_unset=True))
-    if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return updated_user
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Thực hiện cập nhật thông tin người dùng
+            updated_user = UserRepository.update_user(db, id, user_data.dict(exclude_unset=True))
+            if not updated_user:
+                raise HTTPException(status_code=404, detail="User not found")
+
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "User updated successfully", "user": updated_user}
+    except HTTPException as http_exc:
+        # Trả về lỗi HTTPException nếu có
+        raise http_exc
+    except Exception as e:
+        # Xử lý lỗi không mong muốn
+        print("Error occurred while updating user:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 @router.delete("/users/{id}")
 def delete_user(id: int, db: Session = Depends(get_db)):

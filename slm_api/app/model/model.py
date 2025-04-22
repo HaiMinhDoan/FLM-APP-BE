@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Float, DateTime, Boolean,Table, MetaData
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, Float, DateTime, Boolean, Date
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 import json
 from datetime import datetime
@@ -115,6 +115,9 @@ class User(Base):
     code = Column(String(100), default="")
     citizen_id = Column(String(100), default="")
     avatar = Column(String(1000), default="")
+    bank_name = Column(String(255),default="")
+    bank_code = Column(String(255), default="")
+    dob = Column(Date, nullable=True)
     
     role = relationship("Role", back_populates="list_users")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
