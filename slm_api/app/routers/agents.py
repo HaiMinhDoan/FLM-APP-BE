@@ -178,6 +178,7 @@ def check_remaining_adding_customer(agent_id:int,db: Session = Depends(get_db)):
 def create_new_potential_customer(potential_customer_data: PotentialCustomerCreateDTO, db: Session = Depends(get_db)):
     """Tạo khách hàng tiềm năng mới."""
     try:
+        new_cus_id = None
         # Bắt đầu giao dịch
         with db.begin():
             # Kiểm tra khách hàng tiềm năng đã tồn tại hay chưa
@@ -207,9 +208,10 @@ def create_new_potential_customer(potential_customer_data: PotentialCustomerCrea
 
             if not new_potential_customer:
                 raise HTTPException(status_code=500, detail="Failed to create new potential customer")
+            new_cus_id = new_potential_customer.id
 
         # Nếu không có lỗi, trả về kết quả thành công
-        return {"message": "success"}
+        return {"message": "success", "new_cus_id":new_cus_id}
     except HTTPException as http_exc:
         # Trả về lỗi HTTPException nếu có
         raise http_exc
