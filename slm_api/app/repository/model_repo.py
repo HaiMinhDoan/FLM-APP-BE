@@ -167,6 +167,11 @@ class UserRepository:
     def get_user_by_phone(db: Session, phone: str) -> User:
         """Lấy User theo phone."""
         return db.query(User).options(joinedload(User.role)).filter(User.phone == phone).first()
+    
+    @staticmethod
+    def get_active_user_by_phone(db: Session, phone: str) -> User:
+        """Lấy User theo phone."""
+        return db.query(User).options(joinedload(User.role)).filter(User.phone == phone, User.active != False).first()
 
     @staticmethod
     def get_all_users(db: Session):

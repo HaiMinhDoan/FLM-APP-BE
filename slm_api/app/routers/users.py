@@ -239,7 +239,7 @@ def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
 def login(user_data: UserLoginDTO, db: Session = Depends(get_db)):
     """Đăng nhập."""
     # Logic xác thực đăng nhập (ví dụ: so sánh username/password)
-    finding_user  = UserRepository.get_user_by_phone(db, phone= user_data.username)
+    finding_user  = UserRepository.get_active_user_by_phone(db, phone= user_data.username)
     if not finding_user:
         raise HTTPException(status_code=404, detail="User not found")
     if finding_user.password != user_data.password:
