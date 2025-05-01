@@ -179,6 +179,11 @@ class UserRepository:
         return db.query(User).all()
     
     @staticmethod
+    def get_all_active_users(db: Session):
+        """Lấy danh sách tất cả User."""
+        return db.query(User).filter(User.active == True).all()
+    
+    @staticmethod
     def get_all_sales(db: Session):
         """Lấy danh sách tất cả User có Role.name chứa 'ad_sale' hoặc 'agent1'."""
         return (

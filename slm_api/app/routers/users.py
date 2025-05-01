@@ -309,7 +309,7 @@ def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(g
     
     return [{"month": month, "commissions": monthly_commissions[month]} for month in sorted(monthly_commissions.keys())]
 
-@router.delete("/user/delete/{user_id}", response_model=dict)
+@router.delete("/users/delete/{user_id}", response_model=dict)
 def delete_user_by_id(user_id: int, db: Session = Depends(get_db)):
     """Xóa người dùng."""
     try:
