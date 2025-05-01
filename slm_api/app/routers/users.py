@@ -29,7 +29,7 @@ def get_users(db: Session = Depends(get_db)):
 def get_users(db: Session = Depends(get_db)):
     """Lấy danh sách người dùng."""
     users_dict = []
-    users = UserRepository.get_all_users(db)
+    users = UserRepository.get_all_active_users(db)
     for user in users:
         user_dict = user.__dict__.copy()
         user_dict["role"] = user.role.__dict__.copy()
