@@ -146,13 +146,6 @@ def update_user(id: int, user_data: UserUpdateDTO, db: Session = Depends(get_db)
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
-@router.delete("/users/{id}")
-def delete_user(id: int, db: Session = Depends(get_db)):
-    """Xóa người dùng."""
-    if not UserRepository.delete_user(db, id):
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"message": "User deleted successfully"}
-
 @router.put("/users/{id}/{status}")
 def update_user_status(id: int, status: str, db: Session = Depends(get_db)):
     """Cập nhật trạng thái người dùng."""
@@ -315,3 +308,28 @@ def get_user_commission_by_user_id(user_id:int,year:int, db: Session = Depends(g
             commission.pop("_sa_instance_state", None)
     
     return [{"month": month, "commissions": monthly_commissions[month]} for month in sorted(monthly_commissions.keys())]
+
+@router.get("/user/delete/{user_id}", response_model=dict)
+def delete_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    """Xóa người dùng."""
+    try:
+        # Bắt đầu giao dịch
+        with db.begin():
+            # Lấy thông tin người dùng
+            user = UserRepository.get_user_by_id(db, user_id)
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+
+            # Xóa người dùng (cập nhật trạng thái active = False)
+            UserRepository.update_user(db, user_id, {"active": False})
+
+        # Nếu không có lỗi, trả về kết quả thành công
+        return {"message": "User deleted successfully"}
+    except HTTPException as http_exc:
+        # Trả về lỗi HTTPException nếu có
+        raise http_exc
+    except Exception as e:
+        # Xử lý lỗi không mong muốn
+        print("Error occurred while deleting user:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

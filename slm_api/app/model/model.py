@@ -118,6 +118,7 @@ class User(Base):
     bank_name = Column(String(255),default="")
     bank_code = Column(String(255), default="")
     dob = Column(Date, nullable=True)
+    active = Column(Boolean, default=True, nullable=True)
     
     role = relationship("Role", back_populates="list_users")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")  # Liên kết tới LoginHistory
