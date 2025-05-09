@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.model.model import get_db
 from app.repository.model_repo import MerchandiseTemplateRepository, MerchandiseRepository, PriceInfoRepository
-from app.model.dto import MerchandiseTemplateCreateDTO, MerchandiseCreateDTO
+from app.model.dto import MerchandiseTemplateCreateDTO, MerchandiseCreateDTO, MerchandiseUpdateVer2DTO
 from typing import List
 import json
 
@@ -191,7 +191,7 @@ def get_merchandises_with_images(db: Session = Depends(get_db)):
 
 #api cập nhật sản phẩm
 @router.put("/products/{id}")
-def update_merchandise(id: int, merchandise_dto: MerchandiseCreateDTO, db: Session = Depends(get_db)):
+def update_merchandise(id: int, merchandise_dto: MerchandiseUpdateVer2DTO, db: Session = Depends(get_db)):
     """Cập nhật thông tin sản phẩm."""
     try:
         # Lấy sản phẩm hiện tại

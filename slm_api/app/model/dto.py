@@ -82,7 +82,14 @@ class MerchandiseCreateDTO(BaseModel):
     data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
     begin_price: float = Field(..., description="Giá khời đầu")
     
-
+class MerchandiseUpdateVer2DTO(BaseModel):
+    """DTO cho việc cập nhật Merchandise."""
+    name: str = Field(..., max_length=255, description="Tên của Merchandise")
+    data_sheet_link: Optional[str] = Field(None, max_length=800, description="Đường dẫn tài liệu kỹ thuật")
+    unit: str = Field(..., max_length=50, description="Đơn vị của Merchandise")
+    description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
+    description_in_quotation: str = Field(..., description="Mô tả trong báo giá")
+    data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
 
 class MerchandiseUpdateDTO(BaseModel):
     """DTO cho việc cập nhật Merchandise."""
