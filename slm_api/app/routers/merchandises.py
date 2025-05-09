@@ -188,3 +188,48 @@ def get_merchandises_with_images(db: Session = Depends(get_db)):
         
         list_merchandises_dict.append(merchandise_dict)
     return list_merchandises_dict
+
+#api cập nhật sản phẩm
+@router.put("/products/{id}")
+def update_merchandise(id: int, merchandise_dto: MerchandiseCreateDTO, db: Session = Depends(get_db)):
+    """Cập nhật thông tin sản phẩm."""
+    try:
+        # Lấy sản phẩm hiện tại
+        current_merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not current_merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Cập nhật thông tin sản phẩm
+        data_json = ""
+        if merchandise_dto.data_json:
+            data_json = json.dumps(merchandise_dto.data_json)
+        merchandise_data = {
+            "name": merchandise_dto.name,
+            "data_sheet_link": merchandise_dto.data_sheet_link,
+            "unit": merchandise_dto.unit,
+            "description_in_contract": merchandise_dto.description_in_contract,
+            "data_json": data_json,
+            "description_in_quotation" :merchandise_dto.description_in_quotation
+        }
+
+        # Cập nhật sản phẩm
+        updated_merchandise = MerchandiseRepository.update_merchandise(db, id, merchandise_data)
+        if not updated_merchandise:
+            raise HTTPException(status_code=500, detail="Failed to update merchandise")
+
+        # # Cập nhật danh sách hình ảnh
+        # images = merchandise_dto.images
+        # if images:
+        #     # Xóa tất cả hình ảnh hiện tại
+        #     MerchandiseRepository.delete_all_images(db, id)
+        #     for image in images:
+        #         MerchandiseRepository.create_image(db, {"merchandise_id": id, "link": image})
+
+        # Commit giao dịch để lưu dữ liệu
+        db.commit()
+
+        return {"message": "Merchandise updated successfully"}
+    except Exception as e:
+        # Rollback nếu có lỗi
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error updating merchandise: {str(e)}")
