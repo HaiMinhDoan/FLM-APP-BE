@@ -288,7 +288,7 @@ def add_price(id: int, dto: PriceAddDTO, db: Session = Depends(get_db)):
             "import_price_include_vat": dto.import_price_include_vat,
         }
 
-        price = MerchandiseRepository.create_price_info(db, price_data)
+        price = PriceInfoRepository.create_price_info(db, price_data)
         if not price:
             raise HTTPException(status_code=500, detail="Failed to add price")
 
