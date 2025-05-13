@@ -209,7 +209,8 @@ def update_merchandise(id: int, merchandise_dto: MerchandiseUpdateVer2DTO, db: S
             "unit": merchandise_dto.unit,
             "description_in_contract": merchandise_dto.description_in_contract,
             "data_json": data_json,
-            "description_in_quotation" :merchandise_dto.description_in_quotation
+            "description_in_quotation" :merchandise_dto.description_in_quotation,
+            "active": merchandise_dto.active,
         }
 
         # Cập nhật sản phẩm

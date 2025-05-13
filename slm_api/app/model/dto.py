@@ -90,6 +90,7 @@ class MerchandiseUpdateVer2DTO(BaseModel):
     description_in_contract: str = Field(..., description="Mô tả trong hợp đồng")
     description_in_quotation: str = Field(..., description="Mô tả trong báo giá")
     data_json: dict = Field(..., description="Dữ liệu JSON của Merchandise")
+    active: bool = Field(..., description="Trạng thái hoạt động")
 
 class MerchandiseUpdateDTO(BaseModel):
     """DTO cho việc cập nhật Merchandise."""
