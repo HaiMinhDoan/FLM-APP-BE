@@ -134,9 +134,9 @@ def get_merchandises(db: Session = Depends(get_db)):
     return list_merchandises_dict
 
 @router.get("/products/{id}", response_model=dict)
-def get_merchandises(id: int, db: Session = Depends(get_db)):
+def get_merchandise_by_id(id: int, db: Session = Depends(get_db)):
     """Lấy sản phẩm bằng id."""
-    merchandise = MerchandiseRepository.get_merchandise_with_prices_by_id(db = db, id = id)
+    merchandise = MerchandiseRepository.get_merchandise_with_prices_by_id(db = db, merchandise_id = id)
     if not merchandise:
         raise HTTPException(status_code=404, detail="Merchandise not found")
     merchandise_dict = merchandise.__dict__.copy()
