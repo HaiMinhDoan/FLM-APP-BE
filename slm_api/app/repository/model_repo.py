@@ -380,6 +380,10 @@ class MerchandiseRepository:
     def get_merchandise_by_id(db: Session, merchandise_id: int) -> Merchandise:
         """Lấy Merchandise theo ID."""
         return db.query(Merchandise).filter(Merchandise.id == merchandise_id).first()
+    @staticmethod
+    def get_merchandise_with_prices_by_id(db: Session, merchandise_id: int) -> Merchandise:
+        """Lấy Merchandise theo ID."""
+        return db.query(Merchandise).options(joinedload(Merchandise.price_infos), joinedload(Merchandise.template), joinedload(Merchandise.brand), joinedload(Merchandise.supplier)).filter(Merchandise.id == merchandise_id).first()
     
     @staticmethod
     def get_merchandise_by_code(db: Session, code: str) -> Merchandise:
