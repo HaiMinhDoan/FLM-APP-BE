@@ -2,8 +2,9 @@ from sqlalchemy.orm import Session, joinedload
 from app.model.model import Commission,MediaContent, Merchandise, Content, PriceInfo, Brand, Sector, MerchandiseTemplate, User, Notification, LoginHistory
 from app.model.model import Role, Supplier,PreQuoteMerchandise, PreQuote,Token, Customer, ContentCategory, PotentialCustomer, ElectricPrice
 from app.model.model import Image, Banner
-from typing import List
+from typing import List, Optional
 from sqlalchemy import or_
+from sqlalchemy import desc
 
 
 
@@ -453,6 +454,13 @@ class PriceInfoRepository:
     def get_price_infos_by_merchandise_id(db: Session, merchandise_id: int):
         """Lấy danh sách PriceInfo theo Merchandise ID."""
         return db.query(PriceInfo).filter(PriceInfo.merchandise_id == merchandise_id).all()
+    @staticmethod
+    
+    def get_latest_price_by_merchandise_id(db: Session, merchandise_id: int) -> Optional[PriceInfo]:
+        """Get the latest price for a merchandise ID"""
+        return db.query(PriceInfo).filter(
+            PriceInfo.merchandise_id == merchandise_id
+        ).order_by(desc(PriceInfo.created_at)).first()
 
     @staticmethod
     def update_price_info(db: Session, price_info_id: int, update_data: dict) -> PriceInfo:
@@ -1150,5 +1158,54 @@ class ElectricPriceRepository:
         if not electric_price:
             return False
         db.delete(electric_price)
+        db.flush()
+        return True
+    
+class ImageRepository:
+    """Repository cho model Image."""
+
+    @staticmethod
+    def create_image(db: Session, image_data: dict) -> Image:
+        """Tạo một Image mới."""
+        image = Image(**image_data)
+        db.add(image)
+        db.flush()
+        db.refresh(image)
+        return image
+
+    @staticmethod
+    def get_image_by_id(db: Session, image_id: int) -> Image:
+        """Lấy Image theo ID."""
+        return db.query(Image).filter(Image.id == image_id).first()
+    
+    @staticmethod
+    def get_images_by_merchandise_id(db: Session, merchandise_id: int) -> List[Image]:
+        """Get all images for a merchandise ID"""
+        return db.query(Image).filter(Image.merchandise_id == merchandise_id).all()
+
+    @staticmethod
+    def get_all_images(db: Session) -> List[Image]:
+        """Lấy danh sách tất cả Image."""
+        return db.query(Image).all()
+
+    @staticmethod
+    def update_image(db: Session, image_id: int, update_data: dict) -> Image:
+        """Cập nhật Image theo ID."""
+        image = db.query(Image).filter(Image.id == image_id).first()
+        if not image:
+            return None
+        for key, value in update_data.items():
+            setattr(image, key, value)
+        db.flush()
+        db.refresh(image)
+        return image
+
+    @staticmethod
+    def delete_image(db: Session, image_id: int) -> bool:
+        """Xóa Image theo ID."""
+        image = db.query(Image).filter(Image.id == image_id).first()
+        if not image:
+            return False
+        db.delete(image)
         db.flush()
         return True

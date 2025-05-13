@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.model.model import get_db
-from app.repository.model_repo import MerchandiseTemplateRepository, MerchandiseRepository, PriceInfoRepository
+from app.repository.model_repo import MerchandiseTemplateRepository, MerchandiseRepository, PriceInfoRepository, ImageRepository
 from app.model.dto import MerchandiseTemplateCreateDTO, MerchandiseCreateDTO, MerchandiseUpdateVer2DTO
 from typing import List
 import json
-
+from pydantic import BaseModel, validator
+from datetime import datetime
 
 
 router = APIRouter()
@@ -234,3 +235,182 @@ def update_merchandise(id: int, merchandise_dto: MerchandiseUpdateVer2DTO, db: S
         # Rollback nếu có lỗi
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error updating merchandise: {str(e)}")
+    
+    
+    
+# DTOs for price and image operations
+class PriceAddDTO(BaseModel):
+    merchandise_id: int
+    import_price_include_vat: float
+
+    @validator('import_price_include_vat')
+    def validate_price(cls, v):
+        if v < 0:
+            raise ValueError('Price cannot be negative')
+        return v
+
+class ImageAddDTO(BaseModel):
+    merchandise_id: int
+    link: str
+
+    @validator('link')
+    def validate_link(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Image link cannot be empty')
+        return v
+
+class ImagesAddDTO(BaseModel):
+    merchandise_id: int
+    links: List[str]
+
+    @validator('links')
+    def validate_links(cls, v):
+        if not v:
+            raise ValueError('Image links cannot be empty')
+        for link in v:
+            if not link or not link.strip():
+                raise ValueError('Image link cannot be empty')
+        return v
+
+# API Endpoints
+@router.post("/products/{id}/price", status_code=status.HTTP_201_CREATED)
+def add_price(id: int, dto: PriceAddDTO, db: Session = Depends(get_db)):
+    """Add a new price to a product/merchandise."""
+    try:
+        # Check if merchandise exists
+        merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Create price info
+        price_data = {
+            "merchandise_id": id,
+            "import_price_include_vat": dto.import_price_include_vat,
+        }
+
+        price = MerchandiseRepository.create_price_info(db, price_data)
+        if not price:
+            raise HTTPException(status_code=500, detail="Failed to add price")
+
+        # Commit transaction
+        db.commit()
+
+        return {"message": "Price added successfully", "price_id": price.id}
+    except Exception as e:
+        # Rollback on error
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error adding price: {str(e)}")
+
+
+@router.post("/products/{id}/image", status_code=status.HTTP_201_CREATED)
+def add_image(id: int, dto: ImageAddDTO, db: Session = Depends(get_db)):
+    """Add a new image to a product/merchandise."""
+    try:
+        # Check if merchandise exists
+        merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Create image
+        image_data = {
+            "merchandise_id": id,
+            "link": dto.link
+        }
+
+        image = MerchandiseRepository.create_image(db, image_data)
+        if not image:
+            raise HTTPException(status_code=500, detail="Failed to add image")
+
+        # Commit transaction
+        db.commit()
+
+        return {"message": "Image added successfully", "image_id": image.id}
+    except Exception as e:
+        # Rollback on error
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error adding image: {str(e)}")
+
+
+@router.post("/products/{id}/images", status_code=status.HTTP_201_CREATED)
+def add_multiple_images(id: int, dto: ImagesAddDTO, db: Session = Depends(get_db)):
+    """Add multiple images to a product/merchandise."""
+    try:
+        # Check if merchandise exists
+        merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Create images
+        image_ids = []
+        for link in dto.links:
+            image_data = {
+                "merchandise_id": id,
+                "link": link
+            }
+
+            image = MerchandiseRepository.create_image(db, image_data)
+            if not image:
+                raise HTTPException(status_code=500, detail="Failed to add some images")
+            image_ids.append(image.id)
+
+        # Commit transaction
+        db.commit()
+
+        return {"message": f"{len(image_ids)} images added successfully", "image_ids": image_ids}
+    except Exception as e:
+        # Rollback on error
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error adding images: {str(e)}")
+
+
+@router.get("/products/{id}/prices")
+def get_product_prices(id: int, db: Session = Depends(get_db)):
+    """Get all prices for a specific product."""
+    try:
+        # Check if merchandise exists
+        merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Get prices
+        prices = MerchandiseRepository.get_prices_by_merchandise_id(db, id)
+        
+        # Format result
+        result = []
+        for price in prices:
+            result.append({
+                "id": price.id,
+                "merchandise_id": price.merchandise_id,
+                "import_price_include_vat": price.import_price_include_vat,
+                "created_at": price.created_at
+            })
+            
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting prices: {str(e)}")
+
+
+@router.get("/products/{id}/images")
+def get_product_images(id: int, db: Session = Depends(get_db)):
+    """Get all images for a specific product."""
+    try:
+        # Check if merchandise exists
+        merchandise = MerchandiseRepository.get_merchandise_by_id(db, id)
+        if not merchandise:
+            raise HTTPException(status_code=404, detail="Merchandise not found")
+
+        # Get images
+        images = MerchandiseRepository.get_images_by_merchandise_id(db, id)
+        
+        # Format result
+        result = []
+        for image in images:
+            result.append({
+                "id": image.id,
+                "merchandise_id": image.merchandise_id,
+                "link": image.link
+            })
+            
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting images: {str(e)}")
